@@ -12,8 +12,11 @@
 #include "../windowmgr.h"
 #include "interop.hpp"
 #include "../platform/platform.h"
+#include "../log.h"
 
 using namespace openloco;
+
+#define STUB() console::log(__FUNCTION__)
 
 #ifdef _MSC_VER
 #define STDCALL                  __stdcall
@@ -33,7 +36,7 @@ static void
 STDCALL
 fn_40447f()
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
     return;
 }
 
@@ -41,7 +44,7 @@ static void
 STDCALL
 fn_404e8c()
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
     return;
 }
 
@@ -49,7 +52,7 @@ static void
 STDCALL
 fn_404eac(int i1, int i2, int i3, int i4)
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
     return;
 }
 
@@ -71,9 +74,10 @@ fn_4054a3(const palette_entry_t * palette, int32_t index, int32_t count)
     (*set_palette_callback)(palette, index, count);
 }
 
+FORCE_ALIGN_ARG_POINTER
 static bool STDCALL fn_4054b9()
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
     return true;
 }
 
@@ -82,7 +86,7 @@ static uint32_t
 STDCALL
 lib_timeGetTime()
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
     return platform::get_time();
 }
 
@@ -91,7 +95,7 @@ static long
 STDCALL
 fn_DirectSoundEnumerateA(void *pDSEnumCallback, void *pContext)
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
     return 0;
 }
 
@@ -99,7 +103,7 @@ static void
 STDCALL
 fn_4078be()
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
     return;
 }
 
@@ -107,7 +111,7 @@ static void
 STDCALL
 fn_4078fe()
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
     return;
 }
 
@@ -115,7 +119,7 @@ static void
 STDCALL
 fn_407b26()
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
     return;
 }
 
@@ -125,29 +129,29 @@ static void
 CDECL
 fn_4080bb(char *lpWindowName, uint32_t a1)
 {
-    printf("Create progress bar\n");
+    console::log("Create progress bar");
 }
 
 static void
 CDECL
 fn_408163()
 {
-    printf("Destroy progress bar\n");
+    console::log("Destroy progress bar");
 }
 
 static void
 CDECL
 fn_40817b(uint16_t arg0)
 {
-    printf("SendMessage(PBM_SETRANGE, %d)\n", arg0);
-    printf("SendMessage(PBM_SETSTEP, %d)\n", 1);
+    console::log("SendMessage(PBM_SETRANGE, %d)", arg0);
+    console::log("SendMessage(PBM_SETSTEP, %d)", 1);
 }
 
 static void
 CDECL
 fn_4081ad(int32_t wParam)
 {
-    printf("SendMessage(PBM_SETPOS, %d)\n", wParam);
+    console::log("SendMessage(PBM_SETPOS, %d)", wParam);
 }
 
 ///endregion
@@ -157,7 +161,7 @@ static void
 CDECL
 fn_FileSeekFromEnd(FILE *a0, int32_t distance)
 {
-    printf("seek %d bytes from end\n", distance);
+    console::log("seek %d bytes from end", distance);
     fseek(a0, distance, SEEK_END);
 }
 
@@ -166,8 +170,13 @@ static int32_t
 CDECL
 fn_FileRead(FILE *a0, char *buffer, int32_t size)
 {
+<<<<<<< HEAD
     printf("read %d bytes\n", size);
     size = fread(buffer, 1, size, a0);
+=======
+    console::log("read %d bytes", size);
+    fread(buffer, 1, size, a0);
+>>>>>>> 5fdefad... Improve hook logging
 
     return size;
 }
@@ -177,7 +186,7 @@ static int
 CDECL
 fn_CloseHandle(FILE *file)
 {
-    // printf("%s\n", __FUNCTION__);
+    // STUB();
     if (file==nullptr)
     {
         return 1;
@@ -192,7 +201,7 @@ static FILE *
 CDECL
 fn_CreateFile(char *lpFileName)
 {
-    //printf("%s %s\n", __FUNCTION__, lpFileName);
+    //console::log("%s %s", __FUNCTION__, lpFileName);
     FILE *pFILE = fopen(lpFileName, "r");
     return pFILE;
     // return CreateFile(lpFileName, 0x80000000, FILE_SHARE_READ,NULL, OPEN_EXISTING, 0x10000080, 0);
@@ -223,7 +232,7 @@ static Session *
 CDECL
 fn_FindFirstFile(char *lpFileName, FindFileData *out)
 {
-    printf("%s (%s)\n", __FUNCTION__,lpFileName );
+    console::log("%s (%s)", __FUNCTION__,lpFileName );
 
     Session *data = new Session;
 
@@ -256,7 +265,7 @@ static bool
 CDECL
 fn_FindNextFile(Session *data, FindFileData *out)
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
 
     if (data->fileList.size()==0)
     {
@@ -277,7 +286,7 @@ static void
 CDECL
 fn_FindClose(Session *data)
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
 
     delete data;
 }
@@ -286,28 +295,28 @@ static void
 CDECL
 fn_4078b5(void)
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
 }
 
 static void
 CDECL
 fnc0(void)
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
 }
 
 static void
 CDECL
 fnc1(int i1)
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
 }
 
 static void
 CDECL
 fnc2(int i1, int i2)
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
 }
 
 static void
@@ -328,7 +337,7 @@ static void
 STDCALL
 fn2(int i1, int i2)
 {
-    printf("%s\n", __FUNCTION__);
+    STUB();
 }
 
 FORCE_ALIGN_ARG_POINTER
@@ -361,7 +370,7 @@ STDCALL
 void
 fn_dump(uint32_t address)
 {
-    printf("Missing hook: 0x%x\n", address);
+    console::log("Missing hook: 0x%x", address);
 }
 
 enum {
@@ -373,7 +382,7 @@ uint32_t
 STDCALL
 lib_DirectSoundCreate(void* lpGuid, void*ppDS, void*pUnkOuter)
 {
-    printf("lib_DirectSoundCreate(%lx, %lx, %lx)\n", (uintptr_t )lpGuid, (uintptr_t )ppDS, (uintptr_t )pUnkOuter);
+    console::log("lib_DirectSoundCreate(%lx, %lx, %lx)", (uintptr_t )lpGuid, (uintptr_t )ppDS, (uintptr_t )pUnkOuter);
 
     return DSERR_NODRIVER;
 }
@@ -382,7 +391,7 @@ uint32_t
 STDCALL
 lib_CreateRectRgn(int x1, int y1, int x2, int y2)
 {
-    printf("CreateRectRgn(%d, %d, %d, %d)\n", x1, y1, x2, y2);
+    console::log("CreateRectRgn(%d, %d, %d, %d)", x1, y1, x2, y2);
     return 0;
 }
 
@@ -390,7 +399,7 @@ uint
 STDCALL
 lib_GetUpdateRgn(uintptr_t hWnd, uintptr_t hRgn, bool bErase)
 {
-    printf("GetUpdateRgn(%lx, %lx, %d)\n", hWnd, hRgn, bErase);
+    console::log("GetUpdateRgn(%lx, %lx, %d)", hWnd, hRgn, bErase);
     return 0;
 }
 
@@ -398,7 +407,7 @@ void *
 STDCALL
 lib_OpenMutexA(uint32_t dwDesiredAccess, bool bInheritHandle, char *lpName)
 {
-    printf("OpenMutexA(0x%x, %d, %s)\n", dwDesiredAccess, bInheritHandle, lpName);
+    console::log("OpenMutexA(0x%x, %d, %s)", dwDesiredAccess, bInheritHandle, lpName);
 
     return nullptr;
 }
@@ -407,7 +416,7 @@ bool
 STDCALL
 lib_DeleteFileA(char *lpFileName)
 {
-    printf("DeleteFileA(%s)\n", lpFileName);
+    console::log("DeleteFileA(%s)", lpFileName);
 
     return false;
 }
@@ -421,7 +430,7 @@ lib_WriteFile(
     uint32_t *lpNumberOfBytesWritten,
     uintptr_t lpOverlapped)
 {
-    printf("WriteFile(%s)\n", buffer);
+    console::log("WriteFile(%s)", buffer);
 
     return true;
 }
@@ -438,7 +447,7 @@ lib_CreateFileA(
     uint32_t dwFlagsAndAttributes,
     uintptr_t hTemplateFile)
 {
-    printf("CreateFile(%s, %x)\n", lpFileName, dwDesiredAccess);
+    console::log("CreateFile(%s, %x)", lpFileName, dwDesiredAccess);
 
     return fopen(lpFileName, "r");
 }
@@ -450,7 +459,7 @@ lib_SetFileAttributesA(char *lpFileName, uint32_t dwFileAttributes)
 {
     // FILE_ATTRIBUTE_NORMAL = 0x80
     assert(dwFileAttributes==0x80);
-    printf("SetFileAttributes(%s, %x)\n", lpFileName, dwFileAttributes);
+    console::log("SetFileAttributes(%s, %x)", lpFileName, dwFileAttributes);
 
     if (access(lpFileName, R_OK | W_OK)!=-1)
     {
@@ -467,7 +476,7 @@ void *
 STDCALL
 lib_CreateMutexA(uintptr_t lmMutexAttributes, bool bInitialOwner, char *lpName)
 {
-    printf("CreateMutexA(0x%lx, %d, %s)\n", lmMutexAttributes, bInitialOwner, lpName);
+    console::log("CreateMutexA(0x%lx, %d, %s)", lmMutexAttributes, bInitialOwner, lpName);
 
     return nullptr;
 }
@@ -476,7 +485,7 @@ void
 STDCALL
 lib_CloseHandle(int a0)
 {
-    printf("CloseHandle(%d)\n", a0);
+    console::log("CloseHandle(%d)", a0);
 }
 
 void
@@ -484,7 +493,7 @@ STDCALL
 FORCE_ALIGN_ARG_POINTER
 lib_PostQuitMessage(int32_t exitCode)
 {
-    printf("lib_PostQuitMessage(%d)\n", exitCode);
+    console::log("lib_PostQuitMessage(%d)", exitCode);
     exit(exitCode);
 }
 
@@ -492,7 +501,7 @@ void
 STDCALL
 lib_4(int div, int addr, int a0, int a1, int a2, int a3)
 {
-    printf("::::::::::::::::::: %x: %x %x %x %x\n", addr, a0, a1, a2, a3);
+    console::log("::::::::::::::::::: %x: %x %x %x %x", addr, a0, a1, a2, a3);
 }
 
 static void register_no_win32_hooks()
