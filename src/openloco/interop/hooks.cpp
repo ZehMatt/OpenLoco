@@ -170,13 +170,8 @@ static int32_t
 CDECL
 fn_FileRead(FILE *a0, char *buffer, int32_t size)
 {
-<<<<<<< HEAD
-    printf("read %d bytes\n", size);
-    size = fread(buffer, 1, size, a0);
-=======
     console::log("read %d bytes", size);
-    fread(buffer, 1, size, a0);
->>>>>>> 5fdefad... Improve hook logging
+    size = fread(buffer, 1, size, a0);
 
     return size;
 }
