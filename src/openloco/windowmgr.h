@@ -54,6 +54,7 @@ namespace openloco::ui
         prompt_browse = 52,
         prompt_ok_cancel = 54,
         openloco_version = 55,
+
         undefined = 255
     };
 }
@@ -72,6 +73,7 @@ namespace openloco::ui::windowmgr
     window* find_at(int16_t x, int16_t y);
     void invalidate(window_type type);
     void invalidate(window_type type, uint16_t id);
+    void invalidate_widget(window_type type, uint16_t id, uint8_t widget_index);
     void close(window_type type);
     void close(window_type type, uint16_t id);
     window* create_window(window_type type, int32_t x, int32_t y, int32_t width, int32_t height, int32_t flags, void* events);
