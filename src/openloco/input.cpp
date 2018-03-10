@@ -121,8 +121,6 @@ namespace openloco::input
     static void state_normal_left(int16_t x, int16_t y, ui::window* window, ui::widget_t* widget, int8_t widgetIndex);
     static void state_normal_right(int16_t x, int16_t y, ui::window* window, ui::widget_t* widget, int8_t widgetIndex);
     static void loc_4C8689(int16_t x, int16_t y, ui::window* window, ui::widget_t* widget, int8_t widgetIndex);
-    // static void scroll_drag_continue(int16_t x, int16_t y, ui::window* w);
-    //  static void scroll_right(int16_t x, int16_t y, uint8_t state);
     static void input_window_resize(int16_t x, int16_t y, ui::window* window, int32_t widget_index);
     static void window_drag(int16_t x, int16_t y, ui::window* window, int32_t widget_index);
 
@@ -813,72 +811,4 @@ namespace openloco::input
                 break;
         }
     }
-
-    /*
-    // 0x004C76A7
-    static void scroll_right(int16_t x, int16_t y, uint8_t state)
-    {
-        loco_global<uint16_t, 0x0050C19C> time_since_last_tick;
-
-        ui::window* w = ui::windowmgr::find(static_cast<ui::window_type>(_dragWindowType), _dragWindowNumber);
-        if (w == nullptr)
-        {
-            _state = (uint8_t)input_state::reset;
-            return;
-        }
-
-        switch (state)
-        {
-            case 0:
-                _ticksSinceDragStart += time_since_last_tick;
-                if (x != 0 || y != 0)
-                {
-                    _ticksSinceDragStart = 1000;
-                    scroll_drag_continue(x, y, w);
-                }
-                break;
-            case 4:
-                // Used to check if _ticksSinceDragStart was > 500
-                _state = (uint8_t)input_state::reset;
-                break;
-        }
-    }
-
-    // 0x004C8CFD x@<bp>
-    static void scroll_drag_continue(int16_t x, int16_t y, ui::window* w)
-    {
-        if (w == nullptr)
-        {
-            return;
-        }
-
-        ui::widget_t* widget = &w->widgets[_dragWidgetIndex];
-        ui::scroll* scroll = &w->scrolls[_dragScrollIndex];
-
-        if (scroll->flags & scroll_flags::HSCROLLBAR_VISIBLE)
-        {
-            int x2 = scroll->h_right * x;
-            int sizeAlt = widget->right - widget->left - 21;
-            if (scroll->flags & scroll_flags::VSCROLLBAR_VISIBLE)
-            {
-                sizeAlt -= 11;
-            }
-            x2 = x2 / w;
-
-            int size = widget->right - widget->left - 1;
-            if (scroll->flags & scroll_flags::VSCROLLBAR_VISIBLE)
-            {
-                size -= 11;
-            }
-
-            size = std::max(0, scroll->h_right - size);
-            if (size < sizeAlt)
-            {
-                size = sizeAlt;
-            }
-            scroll->h_left = size;
-            scroll_update_thumbs();
-            ui::windowmgr::invalidate_widget((ui::window_type)_dragWindowType, _dragWindowNumber, _dragWidgetIndex);
-        }
-    }*/
 }
