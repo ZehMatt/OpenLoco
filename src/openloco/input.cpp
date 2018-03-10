@@ -271,6 +271,8 @@ namespace openloco::input
                 w->flags |= ui::window_flags::flag_16;
                 if (y >= ui::height() - 2)
                 {
+                    _dragLastX = x;
+                    _dragLastY = y;
                     return;
                 }
 
@@ -279,6 +281,8 @@ namespace openloco::input
 
                 if (dx == 0 && dy == 0)
                 {
+                    _dragLastX = x;
+                    _dragLastY = y;
                     return;
                 }
 
@@ -296,6 +300,8 @@ namespace openloco::input
         {
             if (y >= ui::height() - 2)
             {
+                _dragLastX = x;
+                _dragLastY = y;
                 return;
             }
 
@@ -304,6 +310,8 @@ namespace openloco::input
 
             if (dx == 0 && dy == 0)
             {
+                _dragLastX = x;
+                _dragLastY = y;
                 return;
             }
 
@@ -323,6 +331,9 @@ namespace openloco::input
         w->scroll_areas[1].v_bottom = -1;
         window->update_scroll_widgets();
         w->invalidate();
+
+        _dragLastX = x;
+        _dragLastY = y;
     }
 
     // 0x004C7903
