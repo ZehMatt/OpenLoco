@@ -33,6 +33,7 @@ endif()
 include(FindPkgConfig)
 include(CheckCXXCompilerFlag)
 include(GNUInstallDirs)
+include(Functions)
 
 option(STRICT "Build with warnings as errors" YES)
 
@@ -235,7 +236,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_SHARED_LINKER_FLAG
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-
+find_package(GTest REQUIRED)
 find_package(SDL2 REQUIRED)
 if (TARGET SDL2::SDL2-static)
     set(SDL2_LIBRARIES SDL2::SDL2-static)
@@ -272,6 +273,7 @@ if (NOT CMAKE_CXX_STANDARD)
 endif()
 
 # Display source files nicely in IDEs
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${OLOCO_SOURCES} ${OLOCO_HEADERS})
 
 if (MINGW)
@@ -297,6 +299,8 @@ set(YAML_CPP_INSTALL OFF CACHE BOOL "")
 set(YAML_CPP_FORMAT_SOURCE OFF CACHE BOOL "")
 
 add_subdirectory(src/Thirdparty/yaml-cpp)
+add_subdirectory(src/Example)
+add_subdirectory(src/Example2)
 
 target_compile_options(${PROJECT} PUBLIC ${COMMON_COMPILE_OPTIONS})
 target_link_options(${PROJECT} PUBLIC
