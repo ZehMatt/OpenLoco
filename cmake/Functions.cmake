@@ -137,8 +137,12 @@ function(loco_target_compile_link_flags TARGET)
 endfunction()
 
 function(_loco_add_target TARGET TYPE)
-    cmake_parse_arguments("" "LIBRARY;EXECUTABLE;" "" "PRIVATE_FILES;PUBLIC_FILES;TEST_FILES;" ${ARGN})
+    cmake_parse_arguments("" "LIBRARY;EXECUTABLE;INTERFACE" "" "PRIVATE_FILES;PUBLIC_FILES;TEST_FILES;" ${ARGN})
 
+    if (${TYPE} STREQUAL "INTERFACE")
+        set(_LIBRARY NO)
+        set(_INTERFACE YES)
+    endif()
     # Add public files to target so that source_group works
     # (nice IDE layout)
     if (_LIBRARY)
@@ -151,20 +155,38 @@ function(_loco_add_target TARGET TYPE)
                 "${CMAKE_CURRENT_SOURCE_DIR}/include"
             PRIVATE
                 $<$<BOOL:${_PRIVATE_FILES}>:${CMAKE_CURRENT_SOURCE_DIR}/src>)
-    else()
+        loco_target_compile_link_flags(${TARGET})
+    elseif(_EXECUTABLE)
         add_executable(${TARGET}
             ${_PRIVATE_FILES}
             ${_PUBLIC_FILES})
         target_include_directories(${TARGET}
             PRIVATE
                 ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+        loco_target_compile_link_flags(${TARGET})
+    elseif(_INTERFACE)
+        # We want to add the headers to the interface library so that it displays
+        # nicely wihtin IDEs (unfortunately this feature is from CMake v3.19)
+        if (${CMAKE_MINOR_VERSION} LESS 19)
+            # Delete this when cmake min version updated to >19
+            add_library(${TARGET} ${TYPE})
+        else()
+            add_library(${TARGET} ${TYPE}
+                ${_PUBLIC_FILES})
+        endif()
+        target_include_directories(${TARGET}
+            INTERFACE
+                "${CMAKE_CURRENT_SOURCE_DIR}/include")
     endif()
-    loco_target_compile_link_flags(${TARGET})
     
     # Group the files nicely in IDEs into a tree view
-    source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include" PREFIX "include" FILES ${_PUBLIC_FILES})
-    source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "src" FILES ${_PRIVATE_FILES})
-
+    if (_PUBLIC_FILES)
+        source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include" PREFIX "include" FILES ${_PUBLIC_FILES})
+    endif()
+    if (_PRIVATE_FILES)
+        source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "src" FILES ${_PRIVATE_FILES})
+    endif()
     if (_TEST_FILES AND ${BUILD_TESTS})
         enable_testing()
 
@@ -193,5 +215,4 @@ endfunction()
 
 function(loco_add_executable TARGET)
     _loco_add_target(${TARGET} NULL ${ARGN} EXECUTABLE)
-endfunction() 
-
+endfunction()

@@ -189,8 +189,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(yaml-cpp)
 loco_thirdparty_target_compile_link_flags(yaml-cpp)
 
-add_subdirectory(src/Example)
-add_subdirectory(src/Example2)
+add_subdirectory(src)
 
 # breakpad is also required
 if (MSVC)
@@ -228,6 +227,7 @@ endif ()
 
 loco_target_compile_link_flags(${PROJECT})
 
+target_link_libraries(${PROJECT} Thirdparty)
 target_link_libraries(${PROJECT} ${SDL2_LIB})
 target_link_libraries(${PROJECT} Threads::Threads)
 target_link_libraries(${PROJECT} yaml-cpp)
@@ -335,7 +335,10 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set_source_files_properties(${OLOCO_HEADERS} PROPERTIES LANGUAGE CXX)
     loco_target_compile_link_flags(${PROJECT}-headers-check)
     target_compile_options(${PROJECT}-headers-check PUBLIC -x c++ -Wno-pragma-once-outside-header -Wno-unused-const-variable)
-    target_link_libraries(${PROJECT}-headers-check PUBLIC ${SDL2_LIB} yaml-cpp) # SDL2 and yaml-cpp headers are used in some of our headers
+    target_link_libraries(${PROJECT}-headers-check PUBLIC
+        ${SDL2_LIB} # These libraries are used in some of our headers try to minimize doing this
+        yaml-cpp
+        Thirdparty)
 else ()
     # Dummy target to ease invocation
     add_custom_target(${PROJECT}-headers-check)
