@@ -155,6 +155,13 @@ function(_loco_add_target TARGET TYPE)
                 "${CMAKE_CURRENT_SOURCE_DIR}/include"
             PRIVATE
                 $<$<BOOL:${_PRIVATE_FILES}>:${CMAKE_CURRENT_SOURCE_DIR}/src>)
+
+        # TODO Maybe pass an additional Component variable to the function instead of repeat TARGET
+        if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/OpenLoco/${TARGET}")
+            target_include_directories(${TARGET}
+                PRIVATE
+                    "${CMAKE_CURRENT_SOURCE_DIR}/include/OpenLoco/${TARGET}")
+        endif()
         loco_target_compile_link_flags(${TARGET})
     elseif(_EXECUTABLE)
         add_executable(${TARGET}
