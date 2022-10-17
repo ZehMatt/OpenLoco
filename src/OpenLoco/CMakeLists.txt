@@ -91,8 +91,7 @@ else ()
     target_compile_definitions(OpenLoco PRIVATE DEBUG=${DEBUG_LEVEL} _NO_LOCO_WIN32_=1)
 endif()
 
-if (APPLE)
-    # TODO: This is broken
+if (APPLE AND FALSE) # TODO: This is broken after moving resources into src/Resources
     target_link_libraries(OpenLoco "-framework Cocoa")
 
     set_target_properties(OpenLoco PROPERTIES
