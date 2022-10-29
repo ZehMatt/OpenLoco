@@ -153,7 +153,7 @@ if (UNIX)
     endif ()
 endif()
 
-add_subdirectory(src)
+add_subdirectory(modules)
 
 if (MSVC)
     add_custom_target(OpenLocoExe ALL
