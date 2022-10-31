@@ -34,7 +34,7 @@ if (WIN32)
             GIT_TAG 2022.10.19)
         FetchContent_MakeAvailable(vcpkg)
 
-        set(CMAKE_TOOLCHAIN_FILE ${vcpkg_SOURCE_DIR}/scripts/buildsystems/vcpkg.cmake
+        set(CMAKE_TOOLCHAIN_FILE "${vcpkg_SOURCE_DIR}/scripts/buildsystems/vcpkg.cmake"
             CACHE STRING "CMake toolchain file")
     endif()
 endif ()

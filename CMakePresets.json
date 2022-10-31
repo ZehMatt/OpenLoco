@@ -17,7 +17,7 @@
             },
             "cacheVariables": {
                 "VCPKG_ROOT": {
-                    "type": "STRING",
+                    "type": "PATH",
                     "value": "$env{VCPKG_ROOT}"
                 },
                 "VCPKG_TARGET_TRIPLET": {
