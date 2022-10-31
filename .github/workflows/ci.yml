@@ -82,7 +82,7 @@ jobs:
       - name: Build artifacts
         run: |
           mkdir artifacts | Out-Null
-          Copy-Item CHANGELOG.md,CONTRIBUTORS.md,DEVELOPMENTLOG.md,LICENSE,loco.exe,builds\windows-msvc\modules\OpenLoco\Release\*.dll,builds\windows-msvc\modules\OpenLoco\Release\*.pdb artifacts
+          Copy-Item CHANGELOG.md,CONTRIBUTORS.md,DEVELOPMENTLOG.md,LICENSE,loco.exe,build\windows-msvc\modules\OpenLoco\Release\*.dll,build\windows-msvc\modules\OpenLoco\Release\*.pdb artifacts
           Copy-Item data\language artifacts\data\language -Recurse
           Rename-Item artifacts\loco.exe openloco.exe
       - name: Upload artifacts
