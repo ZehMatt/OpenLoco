@@ -134,6 +134,7 @@ function(loco_target_compile_link_flags TARGET)
     target_link_options(${TARGET} PUBLIC ${COMMON_LINK_OPTIONS})
     target_compile_features(${TARGET} PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
     set_property(TARGET ${TARGET} PROPERTY POSITION_INDEPENDENT_CODE OFF) # Due to the way the linking works we must have no pie (remove when fully implemented)
+    set_property(TARGET ${TARGET} PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 endfunction()
 
 function(_loco_add_target TARGET TYPE)
