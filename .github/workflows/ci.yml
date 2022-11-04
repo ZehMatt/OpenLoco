@@ -83,7 +83,7 @@ jobs:
         run: |
           mkdir artifacts | Out-Null
           Copy-Item CHANGELOG.md,CONTRIBUTORS.md,DEVELOPMENTLOG.md,LICENSE artifacts
-          Copy-Item build\windows-msvc\Release artifacts -Recurse
+          Copy-Item build\windows-msvc\Release\* artifacts -Recurse
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:

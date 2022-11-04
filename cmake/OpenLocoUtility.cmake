@@ -150,6 +150,8 @@ function(_loco_add_target TARGET TYPE)
         add_library(${TARGET} ${TYPE} 
             ${_PRIVATE_FILES}
             ${_PUBLIC_FILES})
+        add_library(OpenLoco::${TARGET} ALIAS ${TARGET})
+
         # We need to include both include and src as src may have private headers
         target_include_directories(${TARGET}
             PUBLIC 
@@ -168,6 +170,8 @@ function(_loco_add_target TARGET TYPE)
         add_executable(${TARGET}
             ${_PRIVATE_FILES}
             ${_PUBLIC_FILES})
+        add_executable(OpenLoco::${TARGET} ALIAS ${TARGET})
+
         target_include_directories(${TARGET}
             PRIVATE
                 ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -178,6 +182,8 @@ function(_loco_add_target TARGET TYPE)
         # nicely wihtin IDEs
         add_library(${TARGET} ${TYPE}
             ${_PUBLIC_FILES})
+        add_library(OpenLoco::${TARGET} ALIAS ${TARGET})
+
         target_include_directories(${TARGET}
             INTERFACE
                 "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -196,6 +202,7 @@ function(_loco_add_target TARGET TYPE)
         # Tests will be under the libraryNameTests.exe
         set(TEST_TARGET ${TARGET}Tests)
         add_executable(${TEST_TARGET} ${_TEST_FILES})
+        add_executable(OpenLoco::${TEST_TARGET} ALIAS ${TEST_TARGET})
 
         target_link_libraries(${TEST_TARGET}
             $<$<BOOL:${_LIBRARY}>:${TARGET}>
