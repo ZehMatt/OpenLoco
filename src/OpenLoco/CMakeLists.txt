@@ -543,7 +543,7 @@ else ()
 endif ()
 
 target_link_libraries(OpenLoco
-    Thirdparty
+    ThirdPartyStdx
     ${SDL2_LIB}
     Threads::Threads
     yaml-cpp
