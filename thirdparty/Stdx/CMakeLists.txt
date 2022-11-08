@@ -1,5 +1,4 @@
-set(public_files 
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/ThirdParty/Stdx/filesystem.hpp"
+set(public_files
     "${CMAKE_CURRENT_SOURCE_DIR}/include/ThirdParty/Stdx/span.hpp"
 )
 

@@ -546,6 +546,7 @@ target_link_libraries(OpenLoco
     ${SDL2_LIB}
     Threads::Threads
     yaml-cpp
+    ghcFilesystem::ghc_filesystem
     ${PNG_LIBRARY}
     ${OPENAL_LIBRARIES})
 
@@ -641,6 +642,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     target_link_libraries(OpenLoco-headers-check PUBLIC
         ${SDL2_LIB} # These libraries are used in some of our headers try to minimize doing this
         yaml-cpp
+        ghcFilesystem::ghc_filesystem
         ThirdPartyStdx)
 else ()
     # Dummy target to ease invocation

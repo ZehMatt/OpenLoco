@@ -113,6 +113,15 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(yaml-cpp)
 loco_thirdparty_target_compile_link_flags(yaml-cpp)
 
+FetchContent_Declare(
+    ghcfilesystem
+    GIT_REPOSITORY      https://github.com/gulrak/filesystem
+    GIT_TAG             cd6805e94dd5d6346be1b75a54cdc27787319dd2
+    GIT_SHALLOW         ON
+    SYSTEM)
+
+FetchContent_MakeAvailable(ghcfilesystem)
+
 # breakpad is also required
 if (MSVC)
     find_package(unofficial-breakpad CONFIG REQUIRED)
