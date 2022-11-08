@@ -466,7 +466,6 @@ set(OLOCO_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Core/LocoFixedVector.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Optional.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Span.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Variant.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Drawing/DrawSpriteBMP.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Drawing/DrawSpriteHelper.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Drawing/DrawSpriteRLE.hpp"

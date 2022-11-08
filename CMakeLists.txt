@@ -175,7 +175,7 @@ if (UNIX)
 endif()
 
 add_subdirectory(src)
-add_subdirectory(ThirdParty)
+add_subdirectory(thirdparty)
 
 if (MSVC)
     add_custom_target(OpenLocoExe ALL

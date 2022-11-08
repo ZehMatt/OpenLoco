@@ -2,7 +2,6 @@
 #include "Audio/Audio.h"
 #include "CompanyManager.h"
 #include "Config.h"
-#include "Core/Variant.hpp"
 #include "Environment.h"
 #include "Game.h"
 #include "GameCommands/GameCommands.h"
@@ -17,6 +16,7 @@
 #include "SceneManager.h"
 #include "Ui/WindowManager.h"
 
+#include <variant>
 #include <vector>
 
 using namespace OpenLoco::Interop;
@@ -43,7 +43,7 @@ namespace OpenLoco::Title
     {
     };
 
-    using TitleStep = stdx::variant<WaitStep, ReloadStep, MoveStep, RotateStep, ResetStep>;
+    using TitleStep = std::variant<WaitStep, ReloadStep, MoveStep, RotateStep, ResetStep>;
     using TitleSequence = std::vector<TitleStep>;
 
     // Helper type for using stdx::visit on TitleStep
@@ -217,7 +217,7 @@ namespace OpenLoco::Title
                 return;
 
             auto& command = *_sequenceIterator++;
-            stdx::visit(overloaded{
+            std::visit(overloaded{
                             [](WaitStep step) {
                                 // This loop slightly deviates from the original, subtract 1 tick to make up for it.
                                 _waitCounter = step.duration - 1;
