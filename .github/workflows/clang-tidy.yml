@@ -11,7 +11,7 @@ jobs:
       run: |
         apt-get update
         apt-get install -y clang-tidy
-    - uses: ZehMatt/clang-tidy-annotations@v1
+    - uses: ZehMatt/clang-tidy-annotations@refactor
       with:
         build_dir: 'build'
         cmake_args: '--preset linux -DCMAKE_CXX_COMPILER=clang++'
