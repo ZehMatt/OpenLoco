@@ -51,4 +51,10 @@ namespace OpenLoco::Audio
     {
         return _source.isPlaying();
     }
+
+    void Channel::setEffect([[maybe_unused]] const OpenAL::Effect& effect)
+    {
+        _source.setEffect(effect);
+    }
+
 }

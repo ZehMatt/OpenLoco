@@ -23,5 +23,6 @@ namespace OpenLoco::Audio
         void begin(EntityId vid);
         void update();
         void stop();
+        void setEffect(const OpenAL::Effect& effect);
     };
 }

@@ -73,6 +73,7 @@ namespace OpenLoco::Audio
     static OpenAL::Device _device;
     static OpenAL::SourceManager _sourceManager;
     static OpenAL::BufferManager _bufferManager;
+    static OpenAL::Effect _effectReverb;
 
     static void playSound(SoundId id, const World::Pos3& loc, int32_t volume, int32_t pan, int32_t frequency);
     static void mixSound(SoundId id, bool loop, int32_t volume, int32_t pan, int32_t freq);
@@ -236,6 +237,9 @@ namespace OpenLoco::Audio
             const auto sourceId = _sourceManager.allocate();
             _vehicleChannels.push_back(Channel(sourceId));
         }
+
+        _effectReverb = _sourceManager.createEffect();
+        _effectReverb.setReverb();
 
         auto css1path = Environment::getPath(Environment::PathId::css1);
         _samples = loadSoundsFromCSS(css1path);
@@ -486,6 +490,7 @@ namespace OpenLoco::Audio
             if (vc != nullptr)
             {
                 vc->begin(v->id);
+                vc->setEffect(_effectReverb);
             }
         }
     }
@@ -506,7 +511,7 @@ namespace OpenLoco::Audio
 
     int32_t calculatePan(const coord_t coord, const int32_t screenSize)
     {
-        const auto relativePosition = (coord << 16) / std::max(screenSize, kVpSizeMin);
+        const auto relativePosition = (coord << 16) / std::max(screenSize * 2, kVpSizeMin * 2);
         return (relativePosition - (1 << 15)) / 16;
     }
 
@@ -604,6 +609,7 @@ namespace OpenLoco::Audio
             channel->setFrequency(freq);
             channel->setPan(pan);
             channel->play(loop);
+            channel->setEffect(_effectReverb);
         }
     }
 
@@ -821,6 +827,7 @@ namespace OpenLoco::Audio
                 for (auto& vc : _vehicleChannels)
                 {
                     vc.update();
+                    //vc.setEffect(_effectReverb);
                 }
                 sub_48A1FA(3);
             }

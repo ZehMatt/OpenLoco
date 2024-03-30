@@ -25,6 +25,8 @@ namespace OpenLoco::Audio
     constexpr int32_t kPanFalloffStart = 2048;
     constexpr int32_t kPanFalloffEnd = 3072;
 
+    static OpenAL::Effect _reverbEffect;
+
     static int8_t getZoomVolumeModifier(uint8_t zoom)
     {
         return std::min<uint8_t>(zoom, 2) * kVolumeModifierZoomIncrement;
@@ -168,4 +170,10 @@ namespace OpenLoco::Audio
         _channel.stop();
         _vehicleId = EntityId::null;
     }
+
+    void VehicleChannel::setEffect(const OpenAL::Effect& effect)
+    {
+        _channel.setEffect(effect);
+    }
+
 }

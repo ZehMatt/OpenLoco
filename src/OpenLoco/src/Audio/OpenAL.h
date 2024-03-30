@@ -9,6 +9,23 @@
 
 namespace OpenAL
 {
+    class Effect
+    {
+    private:
+        uint32_t _id{};
+
+    public:
+        Effect() = default;
+        Effect(uint32_t id)
+            : _id(id)
+        {
+        }
+
+        void setReverb();
+
+        uint32_t getId() const { return _id; }
+    };
+
     class Source
     {
     private:
@@ -32,6 +49,7 @@ namespace OpenAL
         void setPan(float value);
         void setLooping(bool value);
         bool isPlaying() const;
+        void setEffect(const Effect& effect);
         uint32_t getId() const { return _id; }
     };
 
@@ -83,6 +101,9 @@ namespace OpenAL
         Source allocate();
         void deAllocate(const Source& source);
         void dispose();
+
+        Effect createEffect();
+        void freeEffect(const Effect& effect);
     };
 
     float volumeFromLoco(int32_t volume);

@@ -1,8 +1,13 @@
 #include "OpenAL.h"
-#include <AL/al.h>
-#include <AL/alc.h>
+
 #include <algorithm>
 #include <cmath>
+
+#define AL_ALEXT_PROTOTYPES
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alext.h>
+#include <AL/efx.h>
 
 namespace OpenAL
 {
@@ -133,6 +138,16 @@ namespace OpenAL
         return value == AL_PLAYING;
     }
 
+    void Source::setEffect(const Effect& effect)
+    {
+        uint32_t auxSlot;
+        alGenAuxiliaryEffectSlots(1, &auxSlot);
+
+        alAuxiliaryEffectSloti(auxSlot, AL_EFFECTSLOT_EFFECT, effect.getId());
+
+        alSource3i(_id, AL_AUXILIARY_SEND_FILTER, auxSlot, 0, AL_FILTER_NULL);
+    }
+
     float volumeFromLoco(int32_t volume)
     {
         // NOTE: Needs further adjustment
@@ -226,4 +241,34 @@ namespace OpenAL
         alDeleteSources(_sources.size(), _sources.data());
         _sources.clear();
     }
+
+    Effect SourceManager::createEffect()
+    {
+        uint32_t id = 0;
+        alGenEffects(1, &id);
+
+        return Effect(id);
+    }
+
+    void SourceManager::freeEffect(const Effect& effect)
+    {
+        uint32_t id = effect.getId();
+        alDeleteEffects(1, &id);
+    }
+
+    void Effect::setReverb()
+    {
+        alEffecti(_id, AL_EFFECT_TYPE, AL_EFFECT_EAXREVERB);   // Set reverb effects parameters
+        alEffectf(_id, AL_REVERB_DENSITY, 1.0f);               // Adjust density (0.0 to 1.0)
+        alEffectf(_id, AL_REVERB_DIFFUSION, 0.5f);             // Adjust diffusion (0.0 to 1.0)
+        alEffectf(_id, AL_REVERB_GAIN, 0.8f);                  // Adjust overall gain (0.0 to 1.0)
+        alEffectf(_id, AL_REVERB_DECAY_TIME, 6.0f);            // Adjust decay time (seconds)
+        alEffectf(_id, AL_REVERB_REFLECTIONS_GAIN, 0.8f);      // Adjust reflections gain (0.0 to 1.0)
+        alEffectf(_id, AL_REVERB_REFLECTIONS_DELAY, 0.03f);    // Adjust reflections delay (seconds)
+        alEffectf(_id, AL_REVERB_LATE_REVERB_GAIN, 0.7f);      // Adjust late reverb gain (0.0 to 1.0)
+        alEffectf(_id, AL_REVERB_LATE_REVERB_DELAY, 0.1f);     // Adjust late reverb delay (seconds)
+        alEffectf(_id, AL_REVERB_AIR_ABSORPTION_GAINHF, 0.892f); // Adjust air absorption gain (0.892 to 1.0)
+        alEffectf(_id, AL_REVERB_ROOM_ROLLOFF_FACTOR, 0.01f);   // Adjust room rolloff factor (0.0 to 10.0)
+    }
+
 }

@@ -33,6 +33,7 @@ namespace OpenLoco::Audio
         void setPan(int32_t pan);
         void setFrequency(int32_t freq);
         bool isPlaying() const;
+        void setEffect(const OpenAL::Effect& effect);
         const OpenAL::Source& getSource() const { return _source; }
         const Attributes& getAttributes() const { return _attributes; }
     };
