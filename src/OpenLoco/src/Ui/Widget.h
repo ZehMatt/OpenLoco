@@ -3,7 +3,6 @@
 #include "Graphics/Gfx.h"
 #include "Localisation/StringIds.h"
 #include "Localisation/StringManager.h"
-#include "Window.h"
 #include <cstdint>
 
 namespace OpenLoco::Gfx
