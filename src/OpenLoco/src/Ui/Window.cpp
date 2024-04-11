@@ -1201,6 +1201,7 @@ namespace OpenLoco::Ui
         }
 
         uint8_t scrollviewIndex = 0;
+        // Do the legacy widgets.
         for (WidgetIndex_t widgetIndex = 0; widgetIndex < 64; widgetIndex++)
         {
             auto widget = &this->widgets[widgetIndex];
@@ -1211,6 +1212,20 @@ namespace OpenLoco::Ui
             }
 
             widget->draw(rt, this, pressedWidget, tool_widget, hovered_widget, scrollviewIndex);
+        }
+
+        // Do the new ones.
+        scrollviewIndex = 0;
+        for (size_t widgetIndex = 0; widgetIndex < numWidgets; widgetIndex++)
+        {
+            auto& widget = _widgets[widgetIndex];
+
+            if (widget.type == WidgetType::end)
+            {
+                break;
+            }
+
+            widget.draw(rt, this, pressedWidget, tool_widget, hovered_widget, scrollviewIndex);
         }
 
         if (this->hasFlags(WindowFlags::whiteBorderMask))

@@ -7,6 +7,7 @@
 #include "Types.hpp"
 #include "Ui.h"
 #include "Ui/ScrollFlags.hpp"
+#include "Ui/Widget.h"
 #include "Ui/WindowType.h"
 #include "Viewport.hpp"
 #include "World/Company.h"
@@ -14,55 +15,17 @@
 #include <OpenLoco/Core/EnumFlags.hpp>
 #include <OpenLoco/Interop/Interop.hpp>
 #include <algorithm>
+#include <array>
 #include <optional>
 
 namespace OpenLoco::Ui
 {
-    using WidgetIndex_t = int8_t;
     using WindowNumber_t = uint16_t;
-    enum class WidgetType : uint8_t;
     struct Window;
-    struct Widget;
 
 #pragma pack(push, 1)
 
     struct Viewport;
-
-    enum class WidgetType : uint8_t
-    {
-        none = 0,
-        panel = 1,
-        frame = 2,
-        wt_3,
-        wt_4,
-        slider,
-        wt_6,
-        toolbarTab = 7,
-        tab = 8,
-        buttonWithImage = 9,
-        buttonWithColour = 10,
-        button = 11,
-        wt_12,
-        wt_13,
-        buttonTableHeader = 14,
-        wt_15,
-        groupbox = 16,
-        textbox = 17,
-        combobox = 18,
-        viewport = 19,
-        wt_20,
-        wt_21,
-        caption_22,
-        caption_23,
-        caption_24,
-        caption_25,
-        scrollview = 26,
-        checkbox = 27,
-        wt_28,
-        wt_29,
-        viewportCentreButton, // TODO: Make a better generic button so we get the same result.
-        end,
-    };
 
     enum class WindowColour : uint8_t
     {
@@ -268,6 +231,10 @@ namespace OpenLoco::Ui
         int16_t var_88A;
         int16_t var_88C;
 
+        // TODO: Use FixedVector for this.
+        std::array<Widget, 64> _widgets{};
+        size_t numWidgets = 0;
+
         Window(Ui::Point position, Ui::Size size);
 
         constexpr bool setSize(Ui::Size minSize, Ui::Size maxSize)
@@ -344,6 +311,13 @@ namespace OpenLoco::Ui
             return this->hasFlags(WindowFlags::transparent);
         }
 
+        void setWidgets(std::span<Widget> newWidgets)
+        {
+            assert(newWidgets.size() <= _widgets.size());
+            std::copy(newWidgets.begin(), newWidgets.end(), _widgets.begin());
+            numWidgets = newWidgets.size();
+        }
+
         bool isEnabled(int8_t widgetIndex);
         bool isDisabled(int8_t widgetIndex);
         bool isActivated(WidgetIndex_t index);
@@ -415,7 +389,9 @@ namespace OpenLoco::Ui
         WidgetIndex_t prevAvailableWidgetInRange(WidgetIndex_t minIndex, WidgetIndex_t maxIndex);
         WidgetIndex_t nextAvailableWidgetInRange(WidgetIndex_t minIndex, WidgetIndex_t maxIndex);
     };
-    assert_struct_size(Window, 0x88E);
+
+    // No longer valid, not required.
+    // assert_struct_size(Window, 0x88E);
 
     World::Pos2 viewportCoordToMapCoord(int16_t x, int16_t y, int16_t z, int32_t rotation);
     std::optional<World::Pos2> screenGetMapXyWithZ(const Point& mouse, const int16_t z);
