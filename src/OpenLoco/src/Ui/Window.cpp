@@ -1168,6 +1168,82 @@ namespace OpenLoco::Ui
         return eventHandlers->keyUp(*this, charCode, keyCode);
     }
 
+    static bool isWidgetOutOfBounds(Gfx::RenderTarget* rt, const Window* window, const Widget& widget)
+    {
+        if (!window->hasFlags(WindowFlags::noBackground))
+        {
+            // Check if widget is outside the draw region
+            if (window->x + widget.left >= rt->x + rt->width && window->x + widget.right < rt->x)
+            {
+                if (window->y + widget.top >= rt->y + rt->height && window->y + widget.bottom < rt->y)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    static WidgetState getWidgetState(
+        Window* window,
+        const Widget& widget,
+        WidgetIndex_t widgetIndex,
+        uint64_t pressedWidgets,
+        uint64_t toolWidgets,
+        uint64_t hoveredWidgets,
+        uint8_t scrollviewIndex)
+    {
+        Gfx::RectInsetFlags widgetFlags = Gfx::RectInsetFlags::none;
+        if (widget.windowColour == WindowColour::primary && window->hasFlags(WindowFlags::flag_11))
+        {
+            widgetFlags = Gfx::RectInsetFlags::colourLight;
+        }
+
+        WidgetState widgetState{};
+
+        widgetState.window = window;
+        widgetState.flags = widgetFlags;
+        widgetState.colour = window->getColour(widget.windowColour);
+        widgetState.enabled = (window->enabledWidgets & (1ULL << widgetIndex)) != 0;
+        widgetState.disabled = (window->disabledWidgets & (1ULL << widgetIndex)) != 0;
+        widgetState.activated = (window->activatedWidgets & (1ULL << widgetIndex)) != 0;
+        widgetState.activated |= (pressedWidgets & (1ULL << widgetIndex)) != 0;
+        widgetState.activated |= (toolWidgets & (1ULL << widgetIndex)) != 0;
+        widgetState.hovered = (hoveredWidgets & (1ULL << widgetIndex)) != 0;
+        widgetState.scrollviewIndex = scrollviewIndex;
+
+        return widgetState;
+    }
+
+    static void drawWidgets(Gfx::RenderTarget* rt, Window* window, std::span<const Widget> widgets, uint64_t pressedWidgets, uint64_t toolWidgets, uint64_t hoveredWidgets)
+    {
+        uint8_t scrollviewIndex = 0;
+
+        for (WidgetIndex_t widgetIndex = 0; widgetIndex < 64; widgetIndex++)
+        {
+            auto& widget = widgets[widgetIndex];
+            if (widget.type == WidgetType::end)
+            {
+                break;
+            }
+
+            if (isWidgetOutOfBounds(rt, window, widget))
+            {
+                //continue;
+            }
+
+            const auto widgetState = getWidgetState(window, widget, widgetIndex, pressedWidgets, toolWidgets, hoveredWidgets, scrollviewIndex);
+
+            drawWidget(rt, widget, widgetState);
+
+            if (widget.type == WidgetType::scrollview)
+            {
+                scrollviewIndex++;
+            }
+        }
+    }
+
     // 0x004CA4DF
     void Window::draw(Gfx::RenderTarget* rt)
     {
@@ -1200,33 +1276,59 @@ namespace OpenLoco::Ui
             hovered_widget = 1ULL << Input::getHoveredWidgetIndex();
         }
 
-        uint8_t scrollviewIndex = 0;
         // Do the legacy widgets.
+        drawWidgets(rt, this, std::span<const Widget>(widgets, 64), pressedWidget, tool_widget, hovered_widget);
+        /*
         for (WidgetIndex_t widgetIndex = 0; widgetIndex < 64; widgetIndex++)
         {
             auto widget = &this->widgets[widgetIndex];
-
             if (widget->type == WidgetType::end)
             {
                 break;
             }
 
-            widget->draw(rt, this, pressedWidget, tool_widget, hovered_widget, scrollviewIndex);
+            if (isWidgetOutOfBounds(rt, this, *widget))
+            {
+                continue;
+            }
+
+            const auto widgetState = getWidgetState(this, *widget, widgetIndex, pressedWidget, tool_widget, hovered_widget, scrollviewIndex);
+
+            drawWidget(rt, *widget, widgetState);
+
+            if (widget->type == WidgetType::scrollview)
+            {
+                scrollviewIndex++;
+            }
         }
+        */
 
         // Do the new ones.
-        scrollviewIndex = 0;
+        drawWidgets(rt, this, _widgets, pressedWidget, tool_widget, hovered_widget);
+        /*
         for (size_t widgetIndex = 0; widgetIndex < numWidgets; widgetIndex++)
         {
             auto& widget = _widgets[widgetIndex];
-
             if (widget.type == WidgetType::end)
             {
                 break;
             }
 
-            widget.draw(rt, this, pressedWidget, tool_widget, hovered_widget, scrollviewIndex);
+            if (isWidgetOutOfBounds(rt, this, widget))
+            {
+                continue;
+            }
+
+            const auto widgetState = getWidgetState(this, widget, static_cast<WidgetIndex_t>(widgetIndex), pressedWidget, tool_widget, hovered_widget, scrollviewIndex);
+
+            drawWidget(rt, widget, widgetState);
+
+            if (widget.type == WidgetType::scrollview)
+            {
+                scrollviewIndex++;
+            }
         }
+        */
 
         if (this->hasFlags(WindowFlags::whiteBorderMask))
         {

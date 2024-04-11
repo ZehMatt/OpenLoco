@@ -235,6 +235,7 @@ namespace OpenLoco::Ui
         std::array<Widget, 64> _widgets{};
         size_t numWidgets = 0;
 
+        Window() = default;
         Window(Ui::Point position, Ui::Size size);
 
         constexpr bool setSize(Ui::Size minSize, Ui::Size maxSize)
