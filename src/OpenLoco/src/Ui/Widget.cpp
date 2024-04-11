@@ -6,6 +6,7 @@
 #include "Localisation/FormatArguments.hpp"
 #include "Localisation/Formatting.h"
 #include "Ui/ScrollView.h"
+#include "Ui/Widgets/Button.h"
 #include "Window.h"
 #include <OpenLoco/Interop/Interop.hpp>
 #include <cassert>
@@ -59,56 +60,30 @@ namespace OpenLoco::Ui
         return (this->bottom - this->top) + 1;
     }
 
-    void Widget::draw(Gfx::RenderTarget* rt, Window* window, const uint64_t pressedWidgets, const uint64_t toolWidgets, const uint64_t hoveredWidgets, uint8_t& scrollviewIndex)
+    void drawWidget(Gfx::RenderTarget* rt, const Widget& widget, const WidgetState& widgetState)
     {
-        if (!window->hasFlags(WindowFlags::noBackground))
+        if (widget.drawFunction != nullptr)
         {
-            // Check if widget is outside the draw region
-            if (window->x + left >= rt->x + rt->width && window->x + right < rt->x)
-            {
-                if (window->y + top >= rt->y + rt->height && window->y + bottom < rt->y)
-                {
-                    return;
-                }
-            }
+            widget.drawFunction(rt, widget, widgetState);
+            return;
         }
 
-        Gfx::RectInsetFlags widgetFlags = Gfx::RectInsetFlags::none;
-        if (windowColour == WindowColour::primary && window->hasFlags(WindowFlags::flag_11))
-        {
-            widgetFlags = Gfx::RectInsetFlags::colourLight;
-        }
-
-        const auto widgetIndex = this - &window->widgets[0];
-        WidgetState widgetState{};
-
-        widgetState.window = window;
-        widgetState.flags = widgetFlags;
-        widgetState.colour = window->getColour(windowColour);
-        widgetState.enabled = (window->enabledWidgets & (1ULL << widgetIndex)) != 0;
-        widgetState.disabled = (window->disabledWidgets & (1ULL << widgetIndex)) != 0;
-        widgetState.activated = (window->activatedWidgets & (1ULL << widgetIndex)) != 0;
-        widgetState.activated |= (pressedWidgets & (1ULL << widgetIndex)) != 0;
-        widgetState.activated |= (toolWidgets & (1ULL << widgetIndex)) != 0;
-        widgetState.hovered = (hoveredWidgets & (1ULL << widgetIndex)) != 0;
-        widgetState.scrollviewIndex = scrollviewIndex;
-
-        switch (type)
+        switch (widget.type)
         {
             case WidgetType::none:
             case WidgetType::end:
                 break;
 
             case WidgetType::panel:
-                drawPanel(rt, *this, widgetState);
+                drawPanel(rt, widget, widgetState);
                 break;
 
             case WidgetType::frame:
-                drawFrame(rt, *this, widgetState);
+                drawFrame(rt, widget, widgetState);
                 break;
 
             case WidgetType::wt_3:
-                draw_3(rt, *this, widgetState);
+                draw_3(rt, widget, widgetState);
                 break;
 
             case WidgetType::wt_4:
@@ -119,50 +94,50 @@ namespace OpenLoco::Ui
             case WidgetType::wt_6:
             case WidgetType::toolbarTab:
             case WidgetType::tab:
-                drawTabImpl(rt, *this, widgetState);
+                drawTabImpl(rt, widget, widgetState);
                 break;
 
             case WidgetType::buttonWithImage:
-                drawButtonWithImage(rt, *this, widgetState);
+                drawButtonWithImage(rt, widget, widgetState);
                 break;
 
             case WidgetType::buttonWithColour:
-                drawButtonWithColour(rt, *this, widgetState);
+                drawButtonWithColour(rt, widget, widgetState);
                 break;
 
             case WidgetType::button:
             case WidgetType::wt_12:
             case WidgetType::buttonTableHeader:
-                if (type == WidgetType::wt_12)
+                if (widget.type == WidgetType::wt_12)
                 {
                     assert(false); // Unused
                 }
-                drawButton(rt, *this, widgetState);
-                draw_13(rt, *this, widgetState);
+                drawButton(rt, widget, widgetState);
+                draw_13(rt, widget, widgetState);
                 break;
 
             case WidgetType::wt_13:
-                draw_13(rt, *this, widgetState);
+                draw_13(rt, widget, widgetState);
                 break;
 
             case WidgetType::wt_15:
-                draw_15(rt, *this, widgetState);
+                draw_15(rt, widget, widgetState);
                 break;
 
             case WidgetType::groupbox:
                 // NB: widget type 16 has been repurposed to add groupboxes; the original type 16 was unused.
-                drawGroupbox(rt, *this, widgetState);
+                drawGroupbox(rt, widget, widgetState);
                 break;
 
             case WidgetType::textbox:
             case WidgetType::combobox:
-                drawTextBox(rt, *this, widgetState);
-                draw_15(rt, *this, widgetState);
+                drawTextBox(rt, widget, widgetState);
+                draw_15(rt, widget, widgetState);
                 break;
             case WidgetType::viewport:
-                drawTextBox(rt, *this, widgetState);
-                draw_15(rt, *this, widgetState);
-                drawViewports(rt, *this, widgetState);
+                drawTextBox(rt, widget, widgetState);
+                draw_15(rt, widget, widgetState);
+                drawViewports(rt, widget, widgetState);
                 break;
             case WidgetType::wt_20:
             case WidgetType::wt_21:
@@ -170,42 +145,41 @@ namespace OpenLoco::Ui
                 break;
 
             case WidgetType::caption_22:
-                draw_22_caption(rt, *this, widgetState);
+                draw_22_caption(rt, widget, widgetState);
                 break;
 
             case WidgetType::caption_23:
-                draw_23_caption(rt, *this, widgetState);
+                draw_23_caption(rt, widget, widgetState);
                 break;
 
             case WidgetType::caption_24:
-                draw_24_caption(rt, *this, widgetState);
+                draw_24_caption(rt, widget, widgetState);
                 break;
 
             case WidgetType::caption_25:
-                draw_25_caption(rt, *this, widgetState);
+                draw_25_caption(rt, widget, widgetState);
                 break;
 
             case WidgetType::scrollview:
-                drawScrollview(rt, *this, widgetState);
-                scrollviewIndex++;
+                drawScrollview(rt, widget, widgetState);
                 break;
 
             case WidgetType::checkbox:
-                draw_27_checkbox(rt, *this, widgetState);
-                draw_27_label(rt, *this, widgetState);
+                draw_27_checkbox(rt, widget, widgetState);
+                draw_27_label(rt, widget, widgetState);
                 break;
 
             case WidgetType::wt_28:
                 assert(false); // Unused
-                draw_27_label(rt, *this, widgetState);
+                draw_27_label(rt, widget, widgetState);
                 break;
 
             case WidgetType::wt_29:
                 assert(false); // Unused
-                draw_29(rt, *this, widgetState);
+                draw_29(rt, widget, widgetState);
                 break;
             case WidgetType::viewportCentreButton:
-                drawViewportCentreButton(rt, *this, widgetState);
+                drawViewportCentreButton(rt, widget, widgetState);
                 break;
         }
     }
@@ -529,20 +503,7 @@ namespace OpenLoco::Ui
     // 0x004CB164
     static void drawButton(Gfx::RenderTarget* rt, const Widget& widget, const WidgetState& widgetState)
     {
-        auto* window = widgetState.window;
-        int l = window->x + widget.left;
-        int r = window->x + widget.right;
-        int t = window->y + widget.top;
-        int b = window->y + widget.bottom;
-
-        auto flags = widgetState.flags;
-        if (widgetState.activated)
-        {
-            flags |= Gfx::RectInsetFlags::borderInset;
-        }
-
-        auto& drawingCtx = Gfx::getDrawingEngine().getDrawingContext();
-        drawingCtx.fillRectInset(*rt, l, t, r, b, widgetState.colour, flags);
+        Widgets::Button::draw(rt, widget, widgetState);
     }
 
     // 0x004CB1BE
@@ -1188,4 +1149,5 @@ namespace OpenLoco::Ui
             }
         }
     }
+
 }

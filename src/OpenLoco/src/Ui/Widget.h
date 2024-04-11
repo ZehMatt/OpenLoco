@@ -66,6 +66,9 @@ namespace OpenLoco::Ui
         int scrollviewIndex;
     };
 
+    struct Widget;
+    using DrawWidgetFunction = void (*)(Gfx::RenderTarget* context, const Widget& widget, const WidgetState& state);
+
 #pragma pack(push, 1)
     struct Widget
     {
@@ -89,6 +92,7 @@ namespace OpenLoco::Ui
             uint32_t content;
         };
         StringId tooltip; // 0x0E
+        DrawWidgetFunction drawFunction = nullptr;
 
         int16_t midX() const;
         int16_t midY() const;
@@ -101,11 +105,11 @@ namespace OpenLoco::Ui
         // typical tab width, to be used in most (all?) cases
         static constexpr uint16_t kDefaultTabWidth = 30;
         static void leftAlignTabs(Window& window, uint8_t firstTabIndex, uint8_t lastTabIndex, uint16_t tabWidth = kDefaultTabWidth);
-
-        void draw(Gfx::RenderTarget* rt, Window* window, const uint64_t pressedWidgets, const uint64_t toolWidgets, const uint64_t hoveredWidgets, uint8_t& scrollviewIndex);
     };
 #pragma pack(pop)
-    static_assert(sizeof(Widget) == 0x10);
+    // static_assert(sizeof(Widget) == 0x10);
+
+    void drawWidget(Gfx::RenderTarget* context, const Widget& widget, const WidgetState& state);
 
     static constexpr Widget makeWidget(Ui::Point origin, Ui::Size size, WidgetType type, WindowColour colour, uint32_t content = Widget::kContentNull, StringId tooltip = StringIds::null)
     {
