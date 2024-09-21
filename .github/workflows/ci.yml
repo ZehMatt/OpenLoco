@@ -32,10 +32,10 @@ jobs:
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
           vcpkgGitCommitId: 1de2026f28ead93ff1773e6e680387643e914ea1
       - name: Build OpenLoco
-        shell: cmd
-        run: |
-          cmake --preset windows-msvc
-          cmake --build --preset windows-msvc-release
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'windows-msvc'
+          buildPreset: 'windows-msvc-release'
       - name: Build artifacts
         run: |
           mkdir artifacts | Out-Null
@@ -72,7 +72,7 @@ jobs:
       - name: Build OpenLoco
         run: |
           cmake --preset linux -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
-          cmake --build --preset linux-release
+          cmake --build --preset linux-release --parallel 8
       - name: Run Tests
         run: |
           ctest --test-dir build/linux/ --output-on-failure
@@ -97,4 +97,4 @@ jobs:
       - name: Build OpenLoco
         run: |
           cmake --preset mingw -DBUILD_SHARED_LIBS=${{ matrix.build_shared_libs }}
-          cmake --build --preset mingw-release
+          cmake --build --preset mingw-release --parallel 8
