@@ -62,7 +62,7 @@ namespace OpenLoco::Ui
 
     void drawWidget(Gfx::RenderTarget* rt, const Widget& widget, const WidgetState& widgetState)
     {
-        if (widget.drawFunction != nullptr)
+        if (widget.drawFunction != nullptr && widget.type != WidgetType::none)
         {
             widget.drawFunction(rt, widget, widgetState);
             return;
