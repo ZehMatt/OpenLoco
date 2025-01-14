@@ -22,6 +22,8 @@
 #include "World/StationManager.h"
 #include "World/TownManager.h"
 #include <OpenLoco/Interop/Interop.hpp>
+#include <execution>
+#include <sfl/small_vector.hpp>
 
 using namespace OpenLoco::Interop;
 using namespace OpenLoco::World;
@@ -205,6 +207,7 @@ namespace OpenLoco::Ui
         auto alignedX = zoomViewRt.x & ~0x1F;
 
         // Drawing is performed in columns of 32 pixels (1 tile wide)
+        sfl::small_vector<Gfx::RenderTarget, 512> columns;
 
         // Generate and sort columns.
         for (auto columnX = alignedX; columnX < rightBorder; columnX += 32)
@@ -229,14 +232,20 @@ namespace OpenLoco::Ui
 
             columnRt.width = paintRight - columnRt.x;
 
-            drawingCtx.pushRenderTarget(columnRt);
+            columns.push_back(columnRt);
+        }
+
+        // Draw columns.
+        std::for_each(std::execution::par, columns.begin(), columns.end(), [&](const auto& columnRt) {
+            Gfx::SoftwareDrawingContext drawCtx;
+            drawCtx.pushRenderTarget(columnRt);
 
             {
-                drawingCtx.clearSingle(fillColour);
+                drawCtx.clearSingle(fillColour);
                 auto sess = Paint::PaintSession(columnRt, options);
                 sess.generate();
                 sess.arrangeStructs();
-                sess.drawStructs(drawingCtx);
+                sess.drawStructs(drawCtx);
                 // Climate code used to draw here.
 
                 if (!isTitleMode())
@@ -245,21 +254,19 @@ namespace OpenLoco::Ui
                     {
                         if (columnRt.zoomLevel <= Config::get().old.stationNamesMinScale)
                         {
-                            drawStationNames(drawingCtx);
+                            drawStationNames(drawCtx);
                         }
                     }
                     if (!options.hasFlags(ViewportFlags::town_names_displayed))
                     {
-                        drawTownNames(drawingCtx);
+                        drawTownNames(drawCtx);
                     }
                 }
 
-                sess.drawStringStructs(drawingCtx);
-                drawRoutingNumbers(drawingCtx);
+                sess.drawStringStructs(drawCtx);
+                drawRoutingNumbers(drawCtx);
             }
-
-            drawingCtx.popRenderTarget();
-        }
+        });
     }
 
     // 0x004CA444
