@@ -59,6 +59,16 @@ namespace OpenLoco::Gfx
 
         const RenderTarget& getScreenRT();
 
+        // Copy a region of the render target to another render target.
+        void moveRegion(
+            const RenderTarget& rt,
+            int16_t dstX,
+            int16_t dstY,
+            int16_t width,
+            int16_t height,
+            int16_t srcX,
+            int16_t srcY);
+
     private:
         SDL_Renderer* _renderer{};
         SDL_Window* _window{};
