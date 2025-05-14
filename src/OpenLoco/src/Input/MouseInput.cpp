@@ -351,39 +351,33 @@ namespace OpenLoco::Input
         _lastKnownButtonState = button;
 
         Ui::Window* window = WindowManager::findAt(x, y);
-
-        // TODO: I think window can never be null, there is always a main window,
-        //       validate this and work with references from here on.
-
-        Ui::WidgetIndex_t widgetIndex = kWidgetIndexNull;
-        if (window != nullptr)
+        if (window == nullptr)
         {
-            widgetIndex = window->findWidgetAt(x, y);
+            // No window, no need to handle any input.
+            return;
         }
 
         auto modalType = WindowManager::getCurrentModalType();
         if (modalType != WindowType::undefined)
         {
-            if (window != nullptr)
+            if (window->type != modalType)
             {
-                if (window->type != modalType)
+                if (button == MouseButton::leftPressed)
                 {
-                    if (button == MouseButton::leftPressed)
-                    {
-                        WindowManager::bringToFront(modalType);
-                        Audio::playSound(Audio::SoundId::error, x);
-                        return;
-                    }
+                    WindowManager::bringToFront(modalType);
+                    Audio::playSound(Audio::SoundId::error, x);
+                    return;
+                }
 
-                    if (button == MouseButton::rightPressed)
-                    {
-                        return;
-                    }
+                if (button == MouseButton::rightPressed)
+                {
+                    return;
                 }
             }
         }
 
-        Ui::Widget* widget = nullptr;
+        Ui::WidgetIndex_t widgetIndex = window->findWidgetAt(x, y);
+        Ui::Widget* widget = &window->widgets[widgetIndex];
         if (widgetIndex != kWidgetIndexNull)
         {
             widget = &window->widgets[widgetIndex];
