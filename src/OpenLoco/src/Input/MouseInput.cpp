@@ -1414,25 +1414,8 @@ namespace OpenLoco::Input
     // 0x004C834A
     static void stateNormalRight(int16_t x, int16_t y, Ui::Window* window, Ui::WidgetIndex_t widgetIndex)
     {
-        Ui::WindowType windowType = Ui::WindowType::undefined;
-        Ui::WindowNumber_t windowNumber = 0;
-
-        if (window != nullptr)
-        {
-            windowType = window->type;
-            windowNumber = window->number;
-        }
-
         WindowManager::close(Ui::WindowType::tooltip);
-
-        // Window might have changed position in the list, therefore find it again
-        window = WindowManager::find(windowType, windowNumber);
-        if (window == nullptr)
-        {
-            return;
-        }
-
-        window = WindowManager::bringToFront(*window);
+        WindowManager::bringToFront(*window);
 
         if (widgetIndex == -1)
         {
