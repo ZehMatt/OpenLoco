@@ -1,3 +1,5 @@
+#pragma optimize("", off)
+
 #include "Audio/Audio.h"
 #include "Config.h"
 #include "Entities/EntityManager.h"
@@ -37,22 +39,22 @@ using namespace OpenLoco::World;
 
 namespace OpenLoco::Input
 {
-    static void stateScrollLeft(MouseButton cx, WidgetIndex_t edx, Ui::Window* window, Ui::Widget* widget, int16_t x, int16_t y);
+    static void stateScrollLeft(MouseButton cx, WidgetIndex_t edx, Ui::Window& window, Ui::Widget* widget, int16_t x, int16_t y);
     static void stateScrollRight(const MouseButton button, const int16_t x, const int16_t y);
     static void stateResizing(MouseButton button, int16_t x, int16_t y);
-    static void stateWidgetPressed(MouseButton button, int16_t x, int16_t y, Ui::Window* window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex);
-    static void stateNormal(MouseButton state, int16_t x, int16_t y, Ui::Window* window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex);
-    static void stateNormalHover(int16_t x, int16_t y, Ui::Window* window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex);
-    static void stateNormalLeft(int16_t x, int16_t y, Ui::Window* window, Ui::WidgetIndex_t widgetIndex);
-    static void stateNormalRight(int16_t x, int16_t y, Ui::Window* window, Ui::WidgetIndex_t widgetIndex);
-    static void statePositioningWindow(MouseButton button, int16_t x, int16_t y, Ui::Window* window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex);
+    static void stateWidgetPressed(MouseButton button, int16_t x, int16_t y, Ui::Window& window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex);
+    static void stateNormal(MouseButton state, int16_t x, int16_t y, Ui::Window& window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex);
+    static void stateNormalHover(int16_t x, int16_t y, Ui::Window& window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex);
+    static void stateNormalLeft(int16_t x, int16_t y, Ui::Window& window, Ui::WidgetIndex_t widgetIndex);
+    static void stateNormalRight(int16_t x, int16_t y, Ui::Window& window, Ui::WidgetIndex_t widgetIndex);
+    static void statePositioningWindow(MouseButton button, int16_t x, int16_t y, Ui::Window& window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex);
     static void windowPositionEnd();
 
-    static void windowResizeBegin(int16_t x, int16_t y, Ui::Window* window, Ui::WidgetIndex_t widgetIndex);
+    static void windowResizeBegin(int16_t x, int16_t y, Ui::Window& window, Ui::WidgetIndex_t widgetIndex);
 
-    static void viewportDragBegin(Window* w);
+    static void viewportDragBegin(Window& w);
 
-    static void scrollDragBegin(int16_t x, int16_t y, Window* pWindow, WidgetIndex_t index);
+    static void scrollDragBegin(int16_t x, int16_t y, Window& pWindow, WidgetIndex_t index);
 
     static void widgetOverFlatbuttonInvalidate();
 
@@ -392,20 +394,20 @@ namespace OpenLoco::Input
                 _tooltipWindowType = Ui::WindowType::undefined;
                 state(State::normal);
                 resetFlag(Flags::leftMousePressed);
-                stateNormal(button, x, y, window, widget, widgetIndex);
+                stateNormal(button, x, y, *window, widget, widgetIndex);
                 break;
 
             case State::normal:
-                stateNormal(button, x, y, window, widget, widgetIndex);
+                stateNormal(button, x, y, *window, widget, widgetIndex);
                 break;
 
             case State::widgetPressed:
             case State::dropdownActive:
-                stateWidgetPressed(button, x, y, window, widget, widgetIndex);
+                stateWidgetPressed(button, x, y, *window, widget, widgetIndex);
                 break;
 
             case State::positioningWindow:
-                statePositioningWindow(button, x, y, window, widget, widgetIndex);
+                statePositioningWindow(button, x, y, *window, widget, widgetIndex);
                 break;
 
             case State::viewportRight:
@@ -417,7 +419,7 @@ namespace OpenLoco::Input
                 break;
 
             case State::scrollLeft:
-                stateScrollLeft(button, widgetIndex, window, widget, x, y);
+                stateScrollLeft(button, widgetIndex, *window, widget, x, y);
                 break;
 
             case State::resizing:
@@ -642,18 +644,18 @@ namespace OpenLoco::Input
     }
 
     // 0x004C71F6
-    static void stateScrollLeft(const MouseButton button, const WidgetIndex_t widgetIndex, Ui::Window* window, Ui::Widget* const widget, const int16_t x, const int16_t y)
+    static void stateScrollLeft(const MouseButton button, const WidgetIndex_t widgetIndex, Ui::Window& window, Ui::Widget* const widget, const int16_t x, const int16_t y)
     {
         switch (button)
         {
             case MouseButton::released:
             {
-                if (widgetIndex != _pressedWidgetIndex || window->type != _pressedWindowType || window->number != _pressedWindowNumber)
+                if (widgetIndex != _pressedWidgetIndex || window.type != _pressedWindowType || window.number != _pressedWindowNumber)
                 {
                     ScrollView::clearPressedButtons(_pressedWindowType, _pressedWindowNumber, _pressedWidgetIndex);
                     return;
                 }
-                ScrollView::scrollLeftContinue(x, y, *window, widget, widgetIndex);
+                ScrollView::scrollLeftContinue(x, y, window, widget, widgetIndex);
 
                 break;
             }
@@ -829,7 +831,7 @@ namespace OpenLoco::Input
     }
 
     // 0x004C7903
-    static void statePositioningWindow(MouseButton button, int16_t x, int16_t y, [[maybe_unused]] Ui::Window* window, [[maybe_unused]] Ui::Widget* widget, [[maybe_unused]] Ui::WidgetIndex_t widgetIndex)
+    static void statePositioningWindow(MouseButton button, int16_t x, int16_t y, [[maybe_unused]] Ui::Window& window, [[maybe_unused]] Ui::Widget* widget, [[maybe_unused]] Ui::WidgetIndex_t widgetIndex)
     {
         auto w = WindowManager::find(_dragWindowType, _dragWindowNumber);
         if (w == nullptr)
@@ -927,21 +929,21 @@ namespace OpenLoco::Input
         }
     }
 
-    static std::optional<int> dropdownIndexFromPoint(Ui::Window* window, int x, int y)
+    static std::optional<int> dropdownIndexFromPoint(Ui::Window& window, int x, int y)
     {
         // Check whether x and y are over a list item
-        int left = x - window->x;
+        int left = x - window.x;
         if (left < 0)
         {
             return std::nullopt;
         }
-        if (left >= window->width)
+        if (left >= window.width)
         {
             return std::nullopt;
         }
 
         // 2px of padding on the top of the list?
-        int top = y - window->y - 2;
+        int top = y - window.y - 2;
         if (top < 0)
         {
             return std::nullopt;
@@ -989,7 +991,7 @@ namespace OpenLoco::Input
     }
 
     // 0x004C7AE7
-    static void stateWidgetPressed(MouseButton button, int16_t x, int16_t y, Ui::Window* window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex)
+    static void stateWidgetPressed(MouseButton button, int16_t x, int16_t y, Ui::Window& window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex)
     {
         _cursorPressed = { x, y };
 
@@ -1004,9 +1006,9 @@ namespace OpenLoco::Input
         {
             if (_113DC78 & (1 << 0))
             {
-                if (widgetIndex == -1 || *_pressedWindowType != window->type || _pressedWindowNumber != window->number || _pressedWidgetIndex != widgetIndex)
+                if (widgetIndex == -1 || *_pressedWindowType != window.type || _pressedWindowNumber != window.number || _pressedWidgetIndex != widgetIndex)
                 {
-                    if (widgetIndex == -1 || window->type != Ui::WindowType::dropdown)
+                    if (widgetIndex == -1 || window.type != Ui::WindowType::dropdown)
                     {
                         WindowManager::close(Ui::WindowType::dropdown, 0);
 
@@ -1029,14 +1031,9 @@ namespace OpenLoco::Input
         {
             case MouseButton::released: // 0
             {
-                if (window == nullptr)
+                if (window.type == *_pressedWindowType && window.number == _pressedWindowNumber && widgetIndex == _pressedWidgetIndex)
                 {
-                    break;
-                }
-
-                if (window->type == *_pressedWindowType && window->number == _pressedWindowNumber && widgetIndex == _pressedWidgetIndex)
-                {
-                    if (!window->isDisabled(widgetIndex))
+                    if (!window.isDisabled(widgetIndex))
                     {
                         if (_clickRepeatTicks != 0)
                         {
@@ -1044,9 +1041,9 @@ namespace OpenLoco::Input
                         }
 
                         // Handle click repeat
-                        if (window->isHoldable(widgetIndex) && _clickRepeatTicks >= 16 && (_clickRepeatTicks % 4) == 0)
+                        if (window.isHoldable(widgetIndex) && _clickRepeatTicks >= 16 && (_clickRepeatTicks % 4) == 0)
                         {
-                            window->callOnMouseDown(widgetIndex, window->widgets[widgetIndex].id);
+                            window.callOnMouseDown(widgetIndex, window.widgets[widgetIndex].id);
                         }
 
                         bool flagSet = Input::hasFlag(Flags::widgetPressed);
@@ -1066,10 +1063,10 @@ namespace OpenLoco::Input
             case MouseButton::leftPressed: // 1
                 if (Input::state() == State::dropdownActive)
                 {
-                    if (window != nullptr && widgetIndex != kWidgetIndexNull)
+                    if (widgetIndex != kWidgetIndexNull)
                     {
-                        auto buttonWidget = &window->widgets[widgetIndex];
-                        Audio::playSound(Audio::SoundId::clickUp, window->x + buttonWidget->midX());
+                        auto buttonWidget = &window.widgets[widgetIndex];
+                        Audio::playSound(Audio::SoundId::clickUp, window.x + buttonWidget->midX());
                     }
                 }
                 return;
@@ -1099,38 +1096,34 @@ namespace OpenLoco::Input
             // 0x4C7BC7
             if (Input::state() == State::dropdownActive)
             {
-                if (window != nullptr)
+                if (window.type == Ui::WindowType::dropdown)
                 {
-                    if (window->type == Ui::WindowType::dropdown)
+                    auto item = dropdownIndexFromPoint(window, x, y);
+                    if (item.has_value())
                     {
-                        auto item = dropdownIndexFromPoint(window, x, y);
-                        if (item.has_value())
-                        {
-                            dropdownRegisterSelection(*item);
-                        }
+                        dropdownRegisterSelection(*item);
                     }
-                    else
+                }
+                else
+                {
+                    if (window.type == *_pressedWindowType && window.number == _pressedWindowNumber && widgetIndex == _pressedWidgetIndex)
                     {
-                        if (window->type == *_pressedWindowType && window->number == _pressedWindowNumber && widgetIndex == _pressedWidgetIndex)
+                        if (hasFlag(Flags::flag1))
                         {
-                            if (hasFlag(Flags::flag1))
+                            bool flagSet = hasFlag(Flags::flag2);
+                            setFlag(Flags::flag2);
+                            if (!flagSet)
                             {
-                                bool flagSet = hasFlag(Flags::flag2);
-                                setFlag(Flags::flag2);
-                                if (!flagSet)
-                                {
-                                    return;
-                                }
+                                return;
                             }
-
-                            dropdownRegisterSelection(kDropdownItemUndefined);
                         }
+
+                        dropdownRegisterSelection(kDropdownItemUndefined);
                     }
                 }
 
                 // 0x4C7DA0
                 WindowManager::close(Ui::WindowType::dropdown, 0);
-                window = WindowManager::find(_pressedWindowType, _pressedWindowNumber);
             }
 
             Input::state(State::normal);
@@ -1138,15 +1131,16 @@ namespace OpenLoco::Input
             _tooltipWidgetIndex = _pressedWidgetIndex;
             _tooltipWindowType = _pressedWindowType;
             _tooltipWindowNumber = _pressedWindowNumber;
-            if (window != nullptr)
-            {
-                Audio::playSound(Audio::SoundId::clickUp, window->x + widget->midX());
-            }
 
-            if (window != nullptr && window->type == *_pressedWindowType && window->number == _pressedWindowNumber && widgetIndex == _pressedWidgetIndex && !window->isDisabled(widgetIndex))
+            Audio::playSound(Audio::SoundId::clickUp, window.x + widget->midX());
+
+            if (window.type == *_pressedWindowType
+                && window.number == _pressedWindowNumber
+                && widgetIndex == _pressedWidgetIndex
+                && !window.isDisabled(widgetIndex))
             {
                 WindowManager::invalidateWidget(_pressedWindowType, _pressedWindowNumber, _pressedWidgetIndex);
-                window->callOnMouseUp(widgetIndex, window->widgets[widgetIndex].id);
+                window.callOnMouseUp(widgetIndex, window.widgets[widgetIndex].id);
                 return;
             }
         }
@@ -1165,7 +1159,7 @@ namespace OpenLoco::Input
 
         if (Input::state() == State::dropdownActive)
         {
-            if (window != nullptr && window->type == Ui::WindowType::dropdown)
+            if (window.type == Ui::WindowType::dropdown)
             {
                 auto item = dropdownIndexFromPoint(window, x, y);
                 if (item.has_value())
@@ -1178,7 +1172,7 @@ namespace OpenLoco::Input
     }
 
     // 0x004C8048
-    static void stateNormal(MouseButton state, int16_t x, int16_t y, Ui::Window* window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex)
+    static void stateNormal(MouseButton state, int16_t x, int16_t y, Ui::Window& window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex)
     {
         switch (state)
         {
@@ -1198,47 +1192,38 @@ namespace OpenLoco::Input
     }
 
     // 0x004C8098
-    static void stateNormalHover(int16_t x, int16_t y, Ui::Window* window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex)
+    static void stateNormalHover(int16_t x, int16_t y, Ui::Window& window, Ui::Widget* widget, Ui::WidgetIndex_t widgetIndex)
     {
-        Ui::WindowType windowType = Ui::WindowType::undefined;
-        Ui::WindowNumber_t windowNumber = 0;
-
-        if (window != nullptr)
-        {
-            windowType = window->type;
-            windowNumber = window->number;
-        }
-
-        if (windowType != *_hoverWindowType || windowNumber != *_hoverWindowNumber || widgetIndex != *_hoverWidgetIdx)
+        if (window.type != *_hoverWindowType || window.number != *_hoverWindowNumber || widgetIndex != *_hoverWidgetIdx)
         {
             widgetOverFlatbuttonInvalidate();
-            _hoverWindowType = windowType;
-            _hoverWindowNumber = windowNumber;
+            _hoverWindowType = window.type;
+            _hoverWindowNumber = window.number;
             _hoverWidgetIdx = widgetIndex;
             widgetOverFlatbuttonInvalidate();
         }
 
-        if (window != nullptr && widgetIndex != kWidgetIndexNull)
+        if (widgetIndex != kWidgetIndexNull)
         {
-            if (!window->isDisabled(widgetIndex))
+            if (!window.isDisabled(widgetIndex))
             {
-                window->callOnMouseHover(widgetIndex, window->widgets[widgetIndex].id);
+                window.callOnMouseHover(widgetIndex, window.widgets[widgetIndex].id);
             }
         }
 
         StringId tooltipStringId = StringIds::null;
-        if (window != nullptr && widgetIndex != kWidgetIndexNull)
+        if (widgetIndex != kWidgetIndexNull)
         {
             if (widget->type == Ui::WidgetType::scrollview)
             {
-                auto res = Ui::ScrollView::getPart(*window, widget, x, y);
+                auto res = Ui::ScrollView::getPart(window, widget, x, y);
 
                 if (res.area == Ui::ScrollPart::none)
                 {
                 }
                 else if (res.area == Ui::ScrollPart::view)
                 {
-                    window->callScrollMouseOver(res.scrollviewLoc.x, res.scrollviewLoc.y, static_cast<uint8_t>(res.index));
+                    window.callScrollMouseOver(res.scrollviewLoc.x, res.scrollviewLoc.y, static_cast<uint8_t>(res.index));
                 }
                 else
                 {
@@ -1256,7 +1241,7 @@ namespace OpenLoco::Input
 
         if (*_tooltipWindowType != Ui::WindowType::undefined)
         {
-            if (window != nullptr && *_tooltipWindowType == window->type && _tooltipWindowNumber == window->number && _tooltipWidgetIndex == widgetIndex)
+            if (*_tooltipWindowType == window.type && _tooltipWindowNumber == window.number && _tooltipWidgetIndex == widgetIndex)
             {
                 _tooltipTimeout += _timeSinceLastTick;
                 if (_tooltipTimeout >= 8000)
@@ -1302,39 +1287,22 @@ namespace OpenLoco::Input
     }
 
     // 0x004C84BE
-    static void stateNormalLeft(int16_t x, int16_t y, Ui::Window* window, Ui::WidgetIndex_t widgetIndex)
+    static void stateNormalLeft(int16_t x, int16_t y, Ui::Window& window, Ui::WidgetIndex_t widgetIndex)
     {
-        Ui::WindowType windowType = Ui::WindowType::undefined;
-        Ui::WindowNumber_t windowNumber = 0;
-
-        if (window != nullptr)
-        {
-            windowType = window->type;
-            windowNumber = window->number;
-        }
-
         WindowManager::close(Ui::WindowType::error);
         WindowManager::close(Ui::WindowType::tooltip);
+        WindowManager::bringToFront(window);
 
-        // Window might have changed position in the list, therefore find it again
-        window = WindowManager::find(windowType, windowNumber);
-        if (window == nullptr)
-        {
-            return;
-        }
-
-        window = WindowManager::bringToFront(*window);
         if (widgetIndex == -1)
         {
             return;
         }
-        // Widget may have changed memory position during bringToFront
-        auto* widget = &window->widgets[widgetIndex];
+        auto* widget = &window.widgets[widgetIndex];
 
         // Handle text input focus
         if (widget->type == WidgetType::textbox)
         {
-            setFocus(window->type, window->number, widgetIndex);
+            setFocus(window.type, window.number, widgetIndex);
             WindowManager::invalidateWidget(_focusedWindowType, _focusedWindowNumber, _focusedWidgetIndex);
         }
         else
@@ -1352,7 +1320,7 @@ namespace OpenLoco::Input
             case Ui::WidgetType::panel:
             case Ui::WidgetType::newsPanel:
             case Ui::WidgetType::frame:
-                if (window->canResize() && (x >= (window->x + window->width - 19)) && (y >= (window->y + window->height - 19)))
+                if (window.canResize() && (x >= (window.x + window.width - 19)) && (y >= (window.y + window.height - 19)))
                 {
                     windowResizeBegin(x, y, window, widgetIndex);
                 }
@@ -1366,8 +1334,8 @@ namespace OpenLoco::Input
                 state(State::viewportLeft);
                 _dragLast->x = x;
                 _dragLast->y = y;
-                _dragWindowType = window->type;
-                _dragWindowNumber = window->number;
+                _dragWindowType = window.type;
+                _dragWindowNumber = window.number;
                 if (hasFlag(Flags::toolActive))
                 {
                     auto w = WindowManager::find(ToolManager::getToolWindowType(), ToolManager::getToolWindowNumber());
@@ -1383,28 +1351,28 @@ namespace OpenLoco::Input
             case Ui::WidgetType::scrollview:
                 state(State::scrollLeft);
                 _pressedWidgetIndex = widgetIndex;
-                _pressedWindowType = window->type;
-                _pressedWindowNumber = window->number;
+                _pressedWindowType = window.type;
+                _pressedWindowNumber = window.number;
                 _tooltipCursor->x = x;
                 _tooltipCursor->y = y;
-                Ui::ScrollView::scrollLeftBegin(x, y, *window, widget, widgetIndex);
+                Ui::ScrollView::scrollLeftBegin(x, y, window, widget, widgetIndex);
                 break;
 
             default:
-                if (window->isEnabled(widgetIndex) && !window->isDisabled(widgetIndex))
+                if (window.isEnabled(widgetIndex) && !window.isDisabled(widgetIndex))
                 {
-                    Audio::playSound(Audio::SoundId::clickDown, window->x + widget->midX());
+                    Audio::playSound(Audio::SoundId::clickDown, window.x + widget->midX());
 
                     // Set new cursor down widget
                     _pressedWidgetIndex = widgetIndex;
-                    _pressedWindowType = window->type;
-                    _pressedWindowNumber = window->number;
+                    _pressedWindowType = window.type;
+                    _pressedWindowNumber = window.number;
                     setFlag(Flags::widgetPressed);
                     state(State::widgetPressed);
                     _clickRepeatTicks = 1;
 
-                    WindowManager::invalidateWidget(window->type, window->number, widgetIndex);
-                    window->callOnMouseDown(widgetIndex, window->widgets[widgetIndex].id);
+                    WindowManager::invalidateWidget(window.type, window.number, widgetIndex);
+                    window.callOnMouseDown(widgetIndex, window.widgets[widgetIndex].id);
                 }
 
                 break;
@@ -1412,23 +1380,23 @@ namespace OpenLoco::Input
     }
 
     // 0x004C834A
-    static void stateNormalRight(int16_t x, int16_t y, Ui::Window* window, Ui::WidgetIndex_t widgetIndex)
+    static void stateNormalRight(int16_t x, int16_t y, Ui::Window& window, Ui::WidgetIndex_t widgetIndex)
     {
         WindowManager::close(Ui::WindowType::tooltip);
-        WindowManager::bringToFront(*window);
+        WindowManager::bringToFront(window);
 
         if (widgetIndex == -1)
         {
             return;
         }
-        // Widget may have changed memory position during bringToFront
-        auto* widget = &window->widgets[widgetIndex];
+
+        auto* widget = &window.widgets[widgetIndex];
 
         if (WindowManager::getCurrentModalType() != Ui::WindowType::undefined)
         {
-            if (WindowManager::getCurrentModalType() == window->type)
+            if (WindowManager::getCurrentModalType() == window.type)
             {
-                ScrollView::scrollModalRight(x, y, *window, widget, widgetIndex);
+                ScrollView::scrollModalRight(x, y, window, widget, widgetIndex);
             }
 
             return;
@@ -1471,14 +1439,14 @@ namespace OpenLoco::Input
 #pragma mark - Window positioning
 
     // 0x004C877D
-    void windowPositionBegin(int16_t x, int16_t y, Ui::Window* window, Ui::WidgetIndex_t widgetIndex)
+    void windowPositionBegin(int16_t x, int16_t y, Ui::Window& window, Ui::WidgetIndex_t widgetIndex)
     {
         state(State::positioningWindow);
         _pressedWidgetIndex = widgetIndex;
         _dragLast->x = x;
         _dragLast->y = y;
-        _dragWindowType = window->type;
-        _dragWindowNumber = window->number;
+        _dragWindowType = window.type;
+        _dragWindowNumber = window.number;
         _5233A9 = false;
     }
 
@@ -1494,41 +1462,41 @@ namespace OpenLoco::Input
 #pragma mark - Window resizing
 
     // 0x004C85D1
-    static void windowResizeBegin(int16_t x, int16_t y, Ui::Window* window, Ui::WidgetIndex_t widgetIndex)
+    static void windowResizeBegin(int16_t x, int16_t y, Ui::Window& window, Ui::WidgetIndex_t widgetIndex)
     {
         state(State::resizing);
         _pressedWidgetIndex = widgetIndex;
         _dragLast->x = x;
         _dragLast->y = y;
-        _dragWindowType = window->type;
-        _dragWindowNumber = window->number;
-        window->flags &= ~Ui::WindowFlags::flag_15;
+        _dragWindowType = window.type;
+        _dragWindowNumber = window.number;
+        window.flags &= ~Ui::WindowFlags::flag_15;
     }
 
 #pragma mark - Viewport dragging
 
-    static void viewportDragBegin(Window* w)
+    static void viewportDragBegin(Window& w)
     {
-        w->flags &= ~Ui::WindowFlags::scrollingToLocation;
+        w.flags &= ~Ui::WindowFlags::scrollingToLocation;
         state(State::viewportRight);
-        _dragWindowType = w->type;
-        _dragWindowNumber = w->number;
+        _dragWindowType = w.type;
+        _dragWindowNumber = w.number;
         _ticksSinceDragStart = 0;
     }
 
 #pragma mark - Scrollview dragging
 
-    static void scrollDragBegin(int16_t x, int16_t y, Ui::Window* window, Ui::WidgetIndex_t widgetIndex)
+    static void scrollDragBegin(int16_t x, int16_t y, Ui::Window& window, Ui::WidgetIndex_t widgetIndex)
     {
         state(State::scrollRight);
         _dragLast->x = x;
         _dragLast->y = y;
-        _dragWindowType = window->type;
-        _dragWindowNumber = window->number;
+        _dragWindowType = window.type;
+        _dragWindowNumber = window.number;
         _dragWidgetIndex = widgetIndex;
         _ticksSinceDragStart = 0;
 
-        _dragScrollIndex = window->getScrollDataIndex(widgetIndex);
+        _dragScrollIndex = window.getScrollDataIndex(widgetIndex);
 
         Ui::hideCursor();
         startCursorDrag();

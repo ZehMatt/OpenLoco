@@ -48,7 +48,7 @@ namespace OpenLoco::Ui::Windows::DragVehiclePart
         self->setWidgets(widgets);
         self->widgets[widx::frame].right = width - 1;
 
-        Input::windowPositionBegin(Input::getTooltipMouseLocation().x, Input::getTooltipMouseLocation().y, self, widx::frame);
+        Input::windowPositionBegin(Input::getTooltipMouseLocation().x, Input::getTooltipMouseLocation().y, *self, widx::frame);
     }
 
     // 0x004B62FE

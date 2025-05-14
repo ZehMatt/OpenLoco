@@ -50,7 +50,7 @@ namespace OpenLoco::Ui::Windows::ToolTip
             0x004C906B,
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
                 registers backup = regs;
-                Ui::Windows::ToolTip::open((Ui::Window*)regs.esi, regs.edx, regs.ax, regs.bx);
+                Ui::Windows::ToolTip::open(*((Ui::Window*)regs.esi), regs.edx, regs.ax, regs.bx);
                 regs = backup;
                 return 0;
             });
@@ -58,7 +58,7 @@ namespace OpenLoco::Ui::Windows::ToolTip
             0x004C9216,
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
                 registers backup = regs;
-                Ui::Windows::ToolTip::update((Ui::Window*)regs.esi, regs.edx, regs.di, regs.ax, regs.bx);
+                Ui::Windows::ToolTip::update(*((Ui::Window*)regs.esi), regs.edx, regs.di, regs.ax, regs.bx);
                 regs = backup;
                 return 0;
             });
@@ -66,7 +66,7 @@ namespace OpenLoco::Ui::Windows::ToolTip
 
     static const WindowEventList& getEvents();
 
-    static void common([[maybe_unused]] const Window* window, [[maybe_unused]] int32_t widgetIndex, StringId stringId, int16_t cursorX, int16_t cursorY, FormatArguments& args)
+    static void common([[maybe_unused]] const Window& window, [[maybe_unused]] int32_t widgetIndex, StringId stringId, int16_t cursorX, int16_t cursorY, FormatArguments& args)
     {
         StringManager::formatString(_text, stringId, args);
 
@@ -107,25 +107,25 @@ namespace OpenLoco::Ui::Windows::ToolTip
     }
 
     // 0x004C906B
-    void open(Ui::Window* window, int32_t widgetIndex, int16_t cursorX, int16_t cursorY)
+    void open(Ui::Window& window, int32_t widgetIndex, int16_t cursorX, int16_t cursorY)
     {
         WindowManager::close(WindowType::tooltip, 0);
-        if (window == nullptr || widgetIndex == kWidgetIndexNull)
+        if (widgetIndex == kWidgetIndexNull)
         {
             return;
         }
 
-        window->callPrepareDraw();
-        if (window->widgets[widgetIndex].tooltip == StringIds::null)
+        window.callPrepareDraw();
+        if (window.widgets[widgetIndex].tooltip == StringIds::null)
         {
             return;
         }
 
-        _tooltipWindowType = window->type;
-        _tooltipWindowNumber = window->number;
+        _tooltipWindowType = window.type;
+        _tooltipWindowNumber = window.number;
         _tooltipWidgetIndex = widgetIndex;
 
-        auto toolArgs = window->callTooltip(widgetIndex, window->widgets[widgetIndex].id);
+        auto toolArgs = window.callTooltip(widgetIndex, window.widgets[widgetIndex].id);
         if (!toolArgs)
         {
             return;
@@ -139,19 +139,19 @@ namespace OpenLoco::Ui::Windows::ToolTip
 
         _currentTooltipStringId = -1;
 
-        common(window, widgetIndex, window->widgets[widgetIndex].tooltip, cursorX, cursorY, *toolArgs);
+        common(window, widgetIndex, window.widgets[widgetIndex].tooltip, cursorX, cursorY, *toolArgs);
     }
 
     // 0x004C9216
-    void update(Ui::Window* window, int32_t widgetIndex, StringId stringId, int16_t cursorX, int16_t cursorY)
+    void update(Ui::Window& window, int32_t widgetIndex, StringId stringId, int16_t cursorX, int16_t cursorY)
     {
         WindowManager::close(WindowType::tooltip, 0);
 
-        _tooltipWindowType = window->type;
-        _tooltipWindowNumber = window->number;
+        _tooltipWindowType = window.type;
+        _tooltipWindowNumber = window.number;
         _tooltipWidgetIndex = widgetIndex;
 
-        auto toolArgs = window->callTooltip(widgetIndex, window->widgets[widgetIndex].id);
+        auto toolArgs = window.callTooltip(widgetIndex, window.widgets[widgetIndex].id);
         if (!toolArgs)
         {
             return;
