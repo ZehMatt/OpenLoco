@@ -302,6 +302,46 @@ function(_loco_add_headers_check TARGET)
         list(APPEND PUBLIC_INCLUDE_DIRS ${TARGET_INTERFACE_INCLUDE_DIRS})
     endif()
     
+    # Helper function to collect include directories from linked libraries
+    macro(_collect_transitive_includes OUTPUT_VAR LINK_LIBS_PROPERTY)
+        get_target_property(LINK_LIBS ${TARGET} ${LINK_LIBS_PROPERTY})
+        if (LINK_LIBS AND NOT LINK_LIBS STREQUAL "LINK_LIBS-NOTFOUND")
+            foreach(link_lib ${LINK_LIBS})
+                if (TARGET ${link_lib})
+                    get_target_property(lib_includes ${link_lib} INTERFACE_INCLUDE_DIRECTORIES)
+                    if (lib_includes AND NOT lib_includes STREQUAL "lib_includes-NOTFOUND")
+                        foreach(inc_dir ${lib_includes})
+                            list(APPEND ${OUTPUT_VAR} "-I${inc_dir}")
+                        endforeach()
+                    endif()
+                    # Also get system includes
+                    get_target_property(lib_sys_includes ${link_lib} INTERFACE_SYSTEM_INCLUDE_DIRECTORIES)
+                    if (lib_sys_includes AND NOT lib_sys_includes STREQUAL "lib_sys_includes-NOTFOUND")
+                        foreach(inc_dir ${lib_sys_includes})
+                            list(APPEND ${OUTPUT_VAR} "-isystem${inc_dir}")
+                        endforeach()
+                    endif()
+                endif()
+            endforeach()
+        endif()
+    endmacro()
+    
+    # Helper to collect compile definitions
+    macro(_collect_compile_definitions OUTPUT_VAR)
+        get_target_property(TARGET_DEFS ${TARGET} COMPILE_DEFINITIONS)
+        if (TARGET_DEFS AND NOT TARGET_DEFS STREQUAL "TARGET_DEFS-NOTFOUND")
+            foreach(def ${TARGET_DEFS})
+                list(APPEND ${OUTPUT_VAR} "-D${def}")
+            endforeach()
+        endif()
+        get_target_property(TARGET_INTERFACE_DEFS ${TARGET} INTERFACE_COMPILE_DEFINITIONS)
+        if (TARGET_INTERFACE_DEFS AND NOT TARGET_INTERFACE_DEFS STREQUAL "TARGET_INTERFACE_DEFS-NOTFOUND")
+            foreach(def ${TARGET_INTERFACE_DEFS})
+                list(APPEND ${OUTPUT_VAR} "-D${def}")
+            endforeach()
+        endif()
+    endmacro()
+    
     # Filter to only header files (.h, .hpp, .hxx) and separate public from private
     set(PUBLIC_HEADER_FILES)
     set(PRIVATE_HEADER_FILES)
@@ -344,10 +384,13 @@ function(_loco_add_headers_check TARGET)
     
     # Create public headers check target
     if (PUBLIC_HEADER_COUNT GREATER 0)
-        set(PUBLIC_WRAPPER_FILES)
         set(PUBLIC_WRAPPER_DIR "${WRAPPER_DIR}/public")
         file(MAKE_DIRECTORY ${PUBLIC_WRAPPER_DIR})
         
+        set(PUBLIC_HEADER_CHECK_TARGET ${TARGET}-public-headers-check)
+        
+        # Create custom commands for each header (syntax check only, no object files)
+        set(PUBLIC_STAMP_FILES)
         foreach(header_file ${PUBLIC_HEADER_FILES})
             # Find which public include directory this header belongs to
             set(rel_path)
@@ -359,48 +402,61 @@ function(_loco_add_headers_check TARGET)
                 endif()
             endforeach()
             
-            # Fallback to just filename if we couldn't determine relative path
             if (NOT rel_path)
                 get_filename_component(rel_path ${header_file} NAME)
             endif()
             
-            # Replace extension with .cpp
-            string(REGEX REPLACE "\\.[^.]*$" ".cpp" wrapper_rel_path ${rel_path})
-            set(wrapper_file "${PUBLIC_WRAPPER_DIR}/${wrapper_rel_path}")
+            # Create a stamp file path
+            string(REGEX REPLACE "\\.[^.]*$" ".stamp" stamp_rel_path ${rel_path})
+            set(stamp_file "${PUBLIC_WRAPPER_DIR}/${stamp_rel_path}")
             
             # Create subdirectories if needed
-            get_filename_component(wrapper_dir ${wrapper_file} DIRECTORY)
-            file(MAKE_DIRECTORY ${wrapper_dir})
+            get_filename_component(stamp_dir ${stamp_file} DIRECTORY)
+            file(MAKE_DIRECTORY ${stamp_dir})
             
-            file(WRITE ${wrapper_file} "#include \"${header_file}\"\n")
-            list(APPEND PUBLIC_WRAPPER_FILES ${wrapper_file})
+            # Build include flags
+            set(INCLUDE_FLAGS)
+            if (TARGET_INTERFACE_INCLUDE_DIRS)
+                foreach(inc_dir ${TARGET_INTERFACE_INCLUDE_DIRS})
+                    list(APPEND INCLUDE_FLAGS "-I${inc_dir}")
+                endforeach()
+            endif()
+            
+            # Get transitive includes from interface link libraries
+            _collect_transitive_includes(INCLUDE_FLAGS INTERFACE_LINK_LIBRARIES)
+            
+            # Get compile definitions
+            set(COMPILE_DEFS)
+            _collect_compile_definitions(COMPILE_DEFS)
+            
+            # Add custom command to check this header with -fsyntax-only
+            add_custom_command(
+                OUTPUT ${stamp_file}
+                COMMAND ${CMAKE_CXX_COMPILER} -fsyntax-only -w -std=c++${CMAKE_CXX_STANDARD} ${INCLUDE_FLAGS} ${COMPILE_DEFS} -c ${header_file}
+                COMMAND ${CMAKE_COMMAND} -E touch ${stamp_file}
+                DEPENDS ${header_file}
+                COMMENT "Checking public header: ${rel_path}"
+                VERBATIM
+            )
+            
+            list(APPEND PUBLIC_STAMP_FILES ${stamp_file})
         endforeach()
-
-        set(PUBLIC_HEADER_CHECK_TARGET ${TARGET}-public-headers-check)
-        add_library(${PUBLIC_HEADER_CHECK_TARGET} OBJECT ${PUBLIC_WRAPPER_FILES})
-        set_target_properties(${PUBLIC_HEADER_CHECK_TARGET} PROPERTIES LINKER_LANGUAGE CXX)
         
-        # Syntax only is enough to check include correctness. Suppress warnings to avoid noise.
-        target_compile_options(${PUBLIC_HEADER_CHECK_TARGET} PRIVATE -fsyntax-only -w)
-        
-        if (TARGET_INTERFACE_INCLUDE_DIRS)
-            target_include_directories(${PUBLIC_HEADER_CHECK_TARGET} PUBLIC ${TARGET_INTERFACE_INCLUDE_DIRS})
-        endif()
-        
-        get_target_property(TARGET_INTERFACE_LINK_LIBS ${TARGET} INTERFACE_LINK_LIBRARIES)
-        if (TARGET_INTERFACE_LINK_LIBS AND NOT TARGET_INTERFACE_LINK_LIBS STREQUAL "TARGET_INTERFACE_LINK_LIBS-NOTFOUND")
-            target_link_libraries(${PUBLIC_HEADER_CHECK_TARGET} PUBLIC ${TARGET_INTERFACE_LINK_LIBS})
-        endif()
+        # Create a target that depends on all stamp files
+        add_custom_target(${PUBLIC_HEADER_CHECK_TARGET} DEPENDS ${PUBLIC_STAMP_FILES})
         
         add_dependencies(all-headers-check ${PUBLIC_HEADER_CHECK_TARGET})
     endif()
     
     # Create private headers check target
     if (PRIVATE_HEADER_COUNT GREATER 0)
-        set(PRIVATE_WRAPPER_FILES)
         set(PRIVATE_WRAPPER_DIR "${WRAPPER_DIR}/private")
         file(MAKE_DIRECTORY ${PRIVATE_WRAPPER_DIR})
         
+        set(PRIVATE_HEADER_CHECK_TARGET ${TARGET}-private-headers-check)
+        
+        # Create custom commands for each header (syntax check only, no object files)
+        set(PRIVATE_STAMP_FILES)
         foreach(header_file ${PRIVATE_HEADER_FILES})
             # Find which private include directory this header belongs to
             set(rel_path)
@@ -412,46 +468,54 @@ function(_loco_add_headers_check TARGET)
                 endif()
             endforeach()
             
-            # Fallback to just filename if we couldn't determine relative path
             if (NOT rel_path)
                 get_filename_component(rel_path ${header_file} NAME)
             endif()
             
-            # Replace extension with .cpp
-            string(REGEX REPLACE "\\.[^.]*$" ".cpp" wrapper_rel_path ${rel_path})
-            set(wrapper_file "${PRIVATE_WRAPPER_DIR}/${wrapper_rel_path}")
+            # Create a stamp file path
+            string(REGEX REPLACE "\\.[^.]*$" ".stamp" stamp_rel_path ${rel_path})
+            set(stamp_file "${PRIVATE_WRAPPER_DIR}/${stamp_rel_path}")
             
             # Create subdirectories if needed
-            get_filename_component(wrapper_dir ${wrapper_file} DIRECTORY)
-            file(MAKE_DIRECTORY ${wrapper_dir})
+            get_filename_component(stamp_dir ${stamp_file} DIRECTORY)
+            file(MAKE_DIRECTORY ${stamp_dir})
             
-            file(WRITE ${wrapper_file} "#include \"${header_file}\"\n")
-            list(APPEND PRIVATE_WRAPPER_FILES ${wrapper_file})
+            # Build include flags for both private and public includes
+            set(INCLUDE_FLAGS)
+            if (TARGET_INCLUDE_DIRS)
+                foreach(inc_dir ${TARGET_INCLUDE_DIRS})
+                    list(APPEND INCLUDE_FLAGS "-I${inc_dir}")
+                endforeach()
+            endif()
+            if (TARGET_INTERFACE_INCLUDE_DIRS)
+                foreach(inc_dir ${TARGET_INTERFACE_INCLUDE_DIRS})
+                    list(APPEND INCLUDE_FLAGS "-I${inc_dir}")
+                endforeach()
+            endif()
+            
+            # Get transitive includes from all link libraries
+            _collect_transitive_includes(INCLUDE_FLAGS LINK_LIBRARIES)
+            _collect_transitive_includes(INCLUDE_FLAGS INTERFACE_LINK_LIBRARIES)
+            
+            # Get compile definitions
+            set(COMPILE_DEFS)
+            _collect_compile_definitions(COMPILE_DEFS)
+            
+            # Add custom command to check this header with -fsyntax-only
+            add_custom_command(
+                OUTPUT ${stamp_file}
+                COMMAND ${CMAKE_CXX_COMPILER} -fsyntax-only -w -std=c++${CMAKE_CXX_STANDARD} ${INCLUDE_FLAGS} ${COMPILE_DEFS} -c ${header_file}
+                COMMAND ${CMAKE_COMMAND} -E touch ${stamp_file}
+                DEPENDS ${header_file}
+                COMMENT "Checking private header: ${rel_path}"
+                VERBATIM
+            )
+            
+            list(APPEND PRIVATE_STAMP_FILES ${stamp_file})
         endforeach()
-
-        set(PRIVATE_HEADER_CHECK_TARGET ${TARGET}-private-headers-check)
-        add_library(${PRIVATE_HEADER_CHECK_TARGET} OBJECT ${PRIVATE_WRAPPER_FILES})
-        set_target_properties(${PRIVATE_HEADER_CHECK_TARGET} PROPERTIES LINKER_LANGUAGE CXX)
         
-        # Syntax only is enough to check include correctness. Suppress warnings to avoid noise.
-        target_compile_options(${PRIVATE_HEADER_CHECK_TARGET} PRIVATE -fsyntax-only -w)
-        
-        if (TARGET_INCLUDE_DIRS)
-            target_include_directories(${PRIVATE_HEADER_CHECK_TARGET} PUBLIC ${TARGET_INCLUDE_DIRS})
-        endif()
-        if (TARGET_INTERFACE_INCLUDE_DIRS)
-            target_include_directories(${PRIVATE_HEADER_CHECK_TARGET} PUBLIC ${TARGET_INTERFACE_INCLUDE_DIRS})
-        endif()
-        
-        get_target_property(TARGET_LINK_LIBS ${TARGET} LINK_LIBRARIES)
-        if (TARGET_LINK_LIBS AND NOT TARGET_LINK_LIBS STREQUAL "TARGET_LINK_LIBS-NOTFOUND")
-            target_link_libraries(${PRIVATE_HEADER_CHECK_TARGET} PUBLIC ${TARGET_LINK_LIBS})
-        endif()
-        
-        get_target_property(TARGET_INTERFACE_LINK_LIBS ${TARGET} INTERFACE_LINK_LIBRARIES)
-        if (TARGET_INTERFACE_LINK_LIBS AND NOT TARGET_INTERFACE_LINK_LIBS STREQUAL "TARGET_INTERFACE_LINK_LIBS-NOTFOUND")
-            target_link_libraries(${PRIVATE_HEADER_CHECK_TARGET} PUBLIC ${TARGET_INTERFACE_LINK_LIBS})
-        endif()
+        # Create a target that depends on all stamp files
+        add_custom_target(${PRIVATE_HEADER_CHECK_TARGET} DEPENDS ${PRIVATE_STAMP_FILES})
         
         add_dependencies(all-headers-check ${PRIVATE_HEADER_CHECK_TARGET})
     endif()
