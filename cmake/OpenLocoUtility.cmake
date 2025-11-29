@@ -380,6 +380,9 @@ function(_loco_add_headers_check TARGET)
         add_library(${PUBLIC_HEADER_CHECK_TARGET} OBJECT ${PUBLIC_WRAPPER_FILES})
         set_target_properties(${PUBLIC_HEADER_CHECK_TARGET} PROPERTIES LINKER_LANGUAGE CXX)
         
+        # Syntax only is enough to check include correctness. Suppress warnings to avoid noise.
+        target_compile_options(${PUBLIC_HEADER_CHECK_TARGET} PRIVATE -fsyntax-only -w)
+        
         if (TARGET_INTERFACE_INCLUDE_DIRS)
             target_include_directories(${PUBLIC_HEADER_CHECK_TARGET} PUBLIC ${TARGET_INTERFACE_INCLUDE_DIRS})
         endif()
@@ -429,6 +432,9 @@ function(_loco_add_headers_check TARGET)
         set(PRIVATE_HEADER_CHECK_TARGET ${TARGET}-private-headers-check)
         add_library(${PRIVATE_HEADER_CHECK_TARGET} OBJECT ${PRIVATE_WRAPPER_FILES})
         set_target_properties(${PRIVATE_HEADER_CHECK_TARGET} PROPERTIES LINKER_LANGUAGE CXX)
+        
+        # Syntax only is enough to check include correctness. Suppress warnings to avoid noise.
+        target_compile_options(${PRIVATE_HEADER_CHECK_TARGET} PRIVATE -fsyntax-only -w)
         
         if (TARGET_INCLUDE_DIRS)
             target_include_directories(${PRIVATE_HEADER_CHECK_TARGET} PUBLIC ${TARGET_INCLUDE_DIRS})
