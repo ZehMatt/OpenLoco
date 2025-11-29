@@ -146,10 +146,10 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
-      - name: Compile headers
+      - name: Validate Headers
         run: |
           cmake --preset linux -DCMAKE_CXX_COMPILER=${{ matrix.compiler }} -DOPENLOCO_HEADER_CHECK=ON
-          cmake --build --preset linux-debug --target all-headers-check
+          cmake --build --preset linux-release --target all-headers-check
 
   fedora:
     name: Fedora shared=${{ matrix.build_shared_libs }} i686 MinGW32
