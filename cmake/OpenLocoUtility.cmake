@@ -11,7 +11,7 @@ function(_loco_add_target TARGET TYPE)
         add_library(${TARGET} ${TYPE} 
             ${_PRIVATE_FILES}
             ${_PUBLIC_FILES})
-        add_library(OpenLoco::${TARGET} ALIAS ${TARGET})
+        add_library(${PROJECT_NAMESPACE}::${TARGET} ALIAS ${TARGET})
 
         # We need to include both include and src as src may have private headers
         # Note: Generator expresions for this were not working!
@@ -27,16 +27,16 @@ function(_loco_add_target TARGET TYPE)
         endif()
 
         # TODO Maybe pass an additional Component variable to the function instead of repeat TARGET
-        if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/OpenLoco/${TARGET}")
+        if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAMESPACE}/${TARGET}")
             target_include_directories(${TARGET}
                 PRIVATE
-                    "${CMAKE_CURRENT_SOURCE_DIR}/include/OpenLoco/${TARGET}")
+                    "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAMESPACE}/${TARGET}")
         endif()
     elseif(_EXECUTABLE)
         add_executable(${TARGET}
             ${_PRIVATE_FILES}
             ${_PUBLIC_FILES})
-        add_executable(OpenLoco::${TARGET} ALIAS ${TARGET})
+        add_executable(${PROJECT_NAMESPACE}::${TARGET} ALIAS ${TARGET})
 
         target_include_directories(${TARGET}
             PRIVATE
@@ -45,7 +45,7 @@ function(_loco_add_target TARGET TYPE)
         # We want to add the headers to the interface library so that it displays nicely within IDEs
         add_library(${TARGET} ${TYPE}
             ${_PUBLIC_FILES})
-        add_library(OpenLoco::${TARGET} ALIAS ${TARGET})
+        add_library(${PROJECT_NAMESPACE}::${TARGET} ALIAS ${TARGET})
 
         target_include_directories(${TARGET}
             INTERFACE
@@ -55,7 +55,7 @@ function(_loco_add_target TARGET TYPE)
     # Common setup for LIBRARY and EXECUTABLE targets
     if (_LIBRARY OR _EXECUTABLE)
         # Link to common interface
-        target_link_libraries(${TARGET} PUBLIC OpenLocoCommonInterface)
+        target_link_libraries(${TARGET} PUBLIC ${PROJECT_NAMESPACE}CommonInterface)
         
         # Link libraries
         if (DEFINED _PUBLIC_LINK_LIBRARIES)
@@ -78,7 +78,7 @@ function(_loco_add_target TARGET TYPE)
 
     # Defer header check to after configure time
     # This ensures all target properties and dependencies are fully set up
-    if (OPENLOCO_HEADER_CHECK)
+    if (${PROJECT_NAMESPACE}_HEADER_CHECK)
         cmake_language(EVAL CODE "cmake_language(DEFER CALL _loco_add_headers_check \"${TARGET}\")")
     endif()
 
@@ -89,11 +89,11 @@ function(_loco_add_target TARGET TYPE)
     if (_PRIVATE_FILES)
         source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "src" FILES ${_PRIVATE_FILES})
     endif()
-    if (_TEST_FILES AND ${OPENLOCO_BUILD_TESTS})
+    if (_TEST_FILES AND ${${PROJECT_NAMESPACE}_BUILD_TESTS})
         # Tests will be under the libraryNameTests.exe
         set(TEST_TARGET ${TARGET}Tests)
         add_executable(${TEST_TARGET} ${_TEST_FILES})
-        add_executable(OpenLoco::${TEST_TARGET} ALIAS ${TEST_TARGET})
+        add_executable(${PROJECT_NAMESPACE}::${TEST_TARGET} ALIAS ${TEST_TARGET})
 
         target_link_libraries(${TEST_TARGET}
             PRIVATE
@@ -110,16 +110,16 @@ function(_loco_add_target TARGET TYPE)
         source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/tests" PREFIX "tests" FILES ${_TEST_FILES})
         
         # Tell each target about the project directory.
-        target_compile_definitions(${TEST_TARGET} PRIVATE OPENLOCO_PROJECT_PATH="${OPENLOCO_PROJECT_PATH}")
+        target_compile_definitions(${TEST_TARGET} PRIVATE ${PROJECT_NAMESPACE}_PROJECT_PATH="${${PROJECT_NAMESPACE}_PROJECT_PATH}")
 
         # Link to common interface
-        target_link_libraries(${TEST_TARGET} PUBLIC OpenLocoCommonInterface)
+        target_link_libraries(${TEST_TARGET} PUBLIC ${PROJECT_NAMESPACE}CommonInterface)
     endif()
     
     # Tell each target about the project directory.
     # INTERFACE libraries can only have INTERFACE properties
     if (NOT _INTERFACE)
-        target_compile_definitions(${TARGET} PRIVATE OPENLOCO_PROJECT_PATH="${OPENLOCO_PROJECT_PATH}")
+        target_compile_definitions(${TARGET} PRIVATE ${PROJECT_NAMESPACE}_PROJECT_PATH="${${PROJECT_NAMESPACE}_PROJECT_PATH}")
     endif()
 endfunction()
 
@@ -136,7 +136,7 @@ function(_loco_add_headers_check TARGET)
         add_custom_target(all-headers-check)
     endif()
     
-    if (NOT OPENLOCO_HEADER_CHECK OR NOT TARGET ${TARGET})
+    if (NOT ${PROJECT_NAMESPACE}_HEADER_CHECK OR NOT TARGET ${TARGET})
         return()
     endif()
     

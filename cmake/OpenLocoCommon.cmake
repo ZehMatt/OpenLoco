@@ -1,5 +1,5 @@
-# Create INTERFACE library for common OpenLoco targets
-add_library(OpenLocoCommonInterface INTERFACE)
+# Create INTERFACE library for common ${PROJECT_NAMESPACE} targets
+add_library(${PROJECT_NAMESPACE}CommonInterface INTERFACE)
 
 # MSVC
 set(COMMON_COMPILE_OPTIONS_MSVC
@@ -58,7 +58,7 @@ set(COMMON_COMPILE_OPTIONS_GNU
     -Wno-deprecated-declarations
 )
 
-target_compile_options(OpenLocoCommonInterface INTERFACE
+target_compile_options(${PROJECT_NAMESPACE}CommonInterface INTERFACE
     $<$<CXX_COMPILER_ID:MSVC>:${COMMON_COMPILE_OPTIONS_MSVC}>
     $<$<CXX_COMPILER_ID:GNU>:${COMMON_COMPILE_OPTIONS_GNU}>
     $<$<CXX_COMPILER_ID:Clang>:${COMMON_COMPILE_OPTIONS_GNU}>
@@ -76,12 +76,12 @@ set(COMMON_LINK_OPTIONS_MSVC
     $<$<CONFIG:RelWithDebInfo>:/OPT:REF>    # Eliminate unreferenced code/data
 )
 
-target_link_options(OpenLocoCommonInterface INTERFACE
+target_link_options(${PROJECT_NAMESPACE}CommonInterface INTERFACE
     $<$<CXX_COMPILER_ID:MSVC>:${COMMON_LINK_OPTIONS_MSVC}>
 )
 
-target_compile_features(OpenLocoCommonInterface INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
-target_compile_definitions(OpenLocoCommonInterface INTERFACE 
+target_compile_features(${PROJECT_NAMESPACE}CommonInterface INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
+target_compile_definitions(${PROJECT_NAMESPACE}CommonInterface INTERFACE 
     $<$<CONFIG:Debug>:DEBUG=1>
     $<$<NOT:$<CONFIG:Debug>>:DEBUG=0>
 )

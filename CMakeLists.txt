@@ -6,9 +6,10 @@ cmake_policy(SET CMP0069 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 
 set (PROJECT openloco)
+set (PROJECT_NAMESPACE OpenLoco)
 
 # Store the top level source directory in a variable to be passed down to targets.
-set(OPENLOCO_PROJECT_PATH ${CMAKE_SOURCE_DIR})
+set(${PROJECT_NAMESPACE}_PROJECT_PATH ${CMAKE_SOURCE_DIR})
 
 # Note: Searching for CCache must be before project() so project() can use CCache too
 # if it is available
@@ -16,26 +17,26 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 find_package(CCache)
 
 if (CCache_FOUND)
-    option(OPENLOCO_USE_CCACHE "Use CCache to improve recompilation speed (optional)" ON)
-    if (OPENLOCO_USE_CCACHE)
+    option(${PROJECT_NAMESPACE}_USE_CCACHE "Use CCache to improve recompilation speed (optional)" ON)
+    if (${PROJECT_NAMESPACE}_USE_CCACHE)
         # Use e.g. "ccache clang++" instead of "clang++"
         set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCache_EXECUTABLE}")
         set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK    "${CCache_EXECUTABLE}")
-    endif (OPENLOCO_USE_CCACHE)
+    endif (${PROJECT_NAMESPACE}_USE_CCACHE)
 endif (CCache_FOUND)
 
 include(FetchContent)
 
 if (WIN32)
-    set(OPENLOCO_USE_VCPKG_DEFAULT YES)
+    set(${PROJECT_NAMESPACE}_USE_VCPKG_DEFAULT YES)
 else()
-    set(OPENLOCO_USE_VCPKG_DEFAULT NO)
+    set(${PROJECT_NAMESPACE}_USE_VCPKG_DEFAULT NO)
 endif()
-option(OPENLOCO_USE_VCPKG "Use vcpkg for dependencies and toolchain" ${OPENLOCO_USE_VCPKG_DEFAULT})
+option(${PROJECT_NAMESPACE}_USE_VCPKG "Use vcpkg for dependencies and toolchain" ${${PROJECT_NAMESPACE}_USE_VCPKG_DEFAULT})
 
 
-# On windows VCPKG is used to get all dependencies other platforms can use it as well by setting OPENLOCO_USE_VCPKG
-if (OPENLOCO_USE_VCPKG)
+# On windows VCPKG is used to get all dependencies other platforms can use it as well by setting ${PROJECT_NAMESPACE}_USE_VCPKG
+if (${PROJECT_NAMESPACE}_USE_VCPKG)
     if (EXISTS ${VCPKG_ROOT})
         set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
     else()
@@ -83,8 +84,8 @@ include(OpenLocoCommon)
 include(OpenLocoUtility)
 
 option(STRICT "Build with warnings as errors" YES)
-option(OPENLOCO_BUILD_TESTS "Build tests" YES)
-option(OPENLOCO_HEADER_CHECK "Verify all public interfaces are standalone" NO)
+option(${PROJECT_NAMESPACE}_BUILD_TESTS "Build tests" YES)
+option(${PROJECT_NAMESPACE}_HEADER_CHECK "Verify all public interfaces are standalone" NO)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH}")
 
@@ -98,7 +99,7 @@ find_package(Threads REQUIRED)
 # Thirdparty dependencies
 include(thirdparty/CMakeLists.txt)
 
-if (${OPENLOCO_BUILD_TESTS})
+if (${${PROJECT_NAMESPACE}_BUILD_TESTS})
     enable_testing()
 endif()
 

@@ -28,7 +28,7 @@ else()
     endif()
 endif()
 
-if (${OPENLOCO_BUILD_TESTS})
+if (${${PROJECT_NAMESPACE}_BUILD_TESTS})
     find_package(GTest REQUIRED)
 endif()
 
