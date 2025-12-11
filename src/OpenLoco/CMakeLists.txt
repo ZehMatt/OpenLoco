@@ -778,6 +778,8 @@ if (APPLE)
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "io.openloco.OpenLoco")
     set(MACOSX_BUNDLE_ICON_FILE "AppIcon")
 
+    message(STATUS "Version Tag: ${OPENLOCO_COMMIT_SHA1_SHORT}")
+
     if("${OPENLOCO_BRANCH}" STREQUAL "master")
         set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${OPENLOCO_VERSION_TAG}")
     else()
