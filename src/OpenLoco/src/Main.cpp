@@ -1,9 +1,11 @@
 #include "OpenLoco.h"
 #include <OpenLoco/Platform/Platform.h>
 #include <SDL2/SDL_main.h>
+#include <print>
 
 int main(int argc, const char** argv)
 {
+    std::println("{}", "Yes it works");
 #ifdef WIN32
     // Ensures that assert dialogs allow for ignoring them (not the default behaviour for console subsystem)
     _set_error_mode(_OUT_TO_MSGBOX);
