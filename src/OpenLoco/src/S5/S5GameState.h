@@ -10,6 +10,7 @@
 #include "S5Station.h"
 #include "S5Town.h"
 #include "S5Wave.h"
+#include <OpenLoco/Core/Reflection.hpp>
 #include <memory>
 
 namespace OpenLoco
@@ -187,4 +188,86 @@ namespace OpenLoco::S5
     std::unique_ptr<S5::GameState> exportGameState(const OpenLoco::GameState& src);
     std::unique_ptr<S5::GameState> importGameStateType2(const S5::GameStateType2& src);
     std::unique_ptr<OpenLoco::GameState> importGameState(const S5::GameState& src);
+}
+
+namespace OpenLoco::Reflection
+{
+    template<>
+    struct Descriptor<S5::Construction>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::Construction::signals, &S5::Construction::bridges, &S5::Construction::trainStations,
+            &S5::Construction::trackMods, &S5::Construction::var_17A, &S5::Construction::roadStations,
+            &S5::Construction::roadMods);
+    };
+    static_assert(validateDescriptorSize<S5::Construction>());
+
+    template<>
+    struct Descriptor<S5::GeneralState>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::GeneralState::rng, &S5::GeneralState::unkRng, &S5::GeneralState::flags,
+            &S5::GeneralState::currentDay, &S5::GeneralState::dayCounter, &S5::GeneralState::currentYear,
+            &S5::GeneralState::currentMonth, &S5::GeneralState::currentDayOfMonth,
+            &S5::GeneralState::savedViewX, &S5::GeneralState::savedViewY, &S5::GeneralState::savedViewZoom,
+            &S5::GeneralState::savedViewRotation, &S5::GeneralState::playerCompanies,
+            &S5::GeneralState::entityListHeads, &S5::GeneralState::entityListCounts,
+            &S5::GeneralState::pad_0042, &S5::GeneralState::currencyMultiplicationFactor,
+            &S5::GeneralState::unusedCurrencyMultiplicationFactor, &S5::GeneralState::scenarioTicks,
+            &S5::GeneralState::var_014A, &S5::GeneralState::scenarioTicks2, &S5::GeneralState::magicNumber,
+            &S5::GeneralState::numMapAnimations, &S5::GeneralState::tileUpdateStartLocation,
+            &S5::GeneralState::scenarioConstruction, &S5::GeneralState::lastRailroadOption,
+            &S5::GeneralState::lastRoadOption, &S5::GeneralState::lastAirport,
+            &S5::GeneralState::lastShipPort, &S5::GeneralState::trafficHandedness,
+            &S5::GeneralState::lastVehicleType, &S5::GeneralState::pickupDirection,
+            &S5::GeneralState::lastTreeOption, &S5::GeneralState::seaLevel,
+            &S5::GeneralState::currentSnowLine, &S5::GeneralState::currentSeason,
+            &S5::GeneralState::lastLandOption, &S5::GeneralState::maxCompetingCompanies,
+            &S5::GeneralState::orderTableLength, &S5::GeneralState::roadObjectIdIsAnyRoadTypeCompatible,
+            &S5::GeneralState::roadObjectIdIsUsableByAllCompanies,
+            &S5::GeneralState::currentDefaultLevelCrossingType, &S5::GeneralState::lastTrackTypeOption,
+            &S5::GeneralState::loanInterestRate, &S5::GeneralState::lastIndustryOption,
+            &S5::GeneralState::lastBuildingOption, &S5::GeneralState::lastMiscBuildingOption,
+            &S5::GeneralState::lastWallOption, &S5::GeneralState::produceAICompanyTimeout,
+            &S5::GeneralState::tickStartPrngState, &S5::GeneralState::scenarioFileName,
+            &S5::GeneralState::scenarioName, &S5::GeneralState::scenarioDetails,
+            &S5::GeneralState::competitorStartDelay, &S5::GeneralState::preferredAIIntelligence,
+            &S5::GeneralState::preferredAIAggressiveness, &S5::GeneralState::preferredAICompetitiveness,
+            &S5::GeneralState::startingLoanSize, &S5::GeneralState::maxLoanSize,
+            &S5::GeneralState::multiplayerPrng, &S5::GeneralState::multiplayerChecksumA,
+            &S5::GeneralState::multiplayerChecksumB, &S5::GeneralState::lastBuildVehiclesOption,
+            &S5::GeneralState::numberOfIndustries, &S5::GeneralState::vehiclePreviewRotationFrame,
+            &S5::GeneralState::objectiveType, &S5::GeneralState::objectiveFlags,
+            &S5::GeneralState::objectiveCompanyValue, &S5::GeneralState::objectiveMonthlyVehicleProfit,
+            &S5::GeneralState::objectivePerformanceIndex, &S5::GeneralState::objectiveDeliveredCargoType,
+            &S5::GeneralState::objectiveDeliveredCargoAmount, &S5::GeneralState::objectiveTimeLimitYears,
+            &S5::GeneralState::objectiveTimeLimitUntilYear, &S5::GeneralState::objectiveMonthsInChallenge,
+            &S5::GeneralState::objectiveCompletedChallengeInMonths, &S5::GeneralState::industryFlags,
+            &S5::GeneralState::forbiddenVehiclesPlayers, &S5::GeneralState::forbiddenVehiclesCompetitors,
+            &S5::GeneralState::fixFlags, &S5::GeneralState::companyRecords,
+            &S5::GeneralState::var_44C, &S5::GeneralState::var_450, &S5::GeneralState::var_454,
+            &S5::GeneralState::var_458, &S5::GeneralState::var_45C, &S5::GeneralState::var_460,
+            &S5::GeneralState::var_464, &S5::GeneralState::var_468, &S5::GeneralState::lastMapWindowFlags,
+            &S5::GeneralState::lastMapWindowSize, &S5::GeneralState::lastMapWindowVar88A,
+            &S5::GeneralState::lastMapWindowVar88C, &S5::GeneralState::var_478,
+            &S5::GeneralState::pad_047C, &S5::GeneralState::numMessages,
+            &S5::GeneralState::activeMessageIndex, &S5::GeneralState::messages,
+            &S5::GeneralState::pad_B95A, &S5::GeneralState::var_B95C, &S5::GeneralState::pad_B95D,
+            &S5::GeneralState::var_B960, &S5::GeneralState::pad_B961, &S5::GeneralState::var_B962,
+            &S5::GeneralState::pad_B963, &S5::GeneralState::var_B964, &S5::GeneralState::pad_B965,
+            &S5::GeneralState::var_B966, &S5::GeneralState::pad_B967, &S5::GeneralState::currentRainLevel,
+            &S5::GeneralState::pad_B969);
+    };
+    static_assert(validateDescriptorSize<S5::GeneralState>());
+
+    template<>
+    struct Descriptor<S5::GameState>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::GameState::general, &S5::GameState::companies, &S5::GameState::towns,
+            &S5::GameState::industries, &S5::GameState::stations, &S5::GameState::entities,
+            &S5::GameState::animations, &S5::GameState::waves, &S5::GameState::userStrings,
+            &S5::GameState::routings, &S5::GameState::orders);
+    };
+    static_assert(validateDescriptorSize<S5::GameState>());
 }

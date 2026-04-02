@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Economy/Currency.h"
+#include <OpenLoco/Core/Reflection.hpp>
 #include <OpenLoco/Engine/World.hpp>
 
 namespace OpenLoco
@@ -279,4 +280,87 @@ namespace OpenLoco::S5
     S5::Records exportRecords(const OpenLoco::CompanyManager::Records& src);
     OpenLoco::CompanyManager::Records importRecords(const S5::Records& src);
     OpenLoco::Company importCompany(const S5::Company& src);
+}
+
+namespace OpenLoco::Reflection
+{
+    template<>
+    struct Descriptor<S5::Records>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::Records::speed, &S5::Records::company, &S5::Records::pad_43A, &S5::Records::date);
+    };
+    static_assert(validateDescriptorSize<S5::Records>());
+
+    template<>
+    struct Descriptor<S5::AiThought::Station>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::AiThought::Station::id, &S5::AiThought::Station::var_02,
+            &S5::AiThought::Station::rotation, &S5::AiThought::Station::pos,
+            &S5::AiThought::Station::baseZ, &S5::AiThought::Station::var_9,
+            &S5::AiThought::Station::var_A, &S5::AiThought::Station::var_B,
+            &S5::AiThought::Station::var_C, &S5::AiThought::Station::pad_D);
+    };
+    static_assert(validateDescriptorSize<S5::AiThought::Station>());
+
+    template<>
+    struct Descriptor<S5::AiThought>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::AiThought::type, &S5::AiThought::destinationA, &S5::AiThought::destinationB,
+            &S5::AiThought::numStations, &S5::AiThought::stationLength, &S5::AiThought::pad_05,
+            &S5::AiThought::stations, &S5::AiThought::trackObjId, &S5::AiThought::rackRailType,
+            &S5::AiThought::mods, &S5::AiThought::cargoType, &S5::AiThought::var_43,
+            &S5::AiThought::numVehicles, &S5::AiThought::var_45, &S5::AiThought::var_46,
+            &S5::AiThought::vehicles, &S5::AiThought::var_76, &S5::AiThought::pad_7A,
+            &S5::AiThought::var_7C, &S5::AiThought::var_80, &S5::AiThought::var_84,
+            &S5::AiThought::var_88, &S5::AiThought::stationObjId, &S5::AiThought::signalObjId,
+            &S5::AiThought::purchaseFlags);
+    };
+    static_assert(validateDescriptorSize<S5::AiThought>());
+
+    template<>
+    struct Descriptor<S5::Company>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::Company::name, &S5::Company::ownerName, &S5::Company::challengeFlags,
+            &S5::Company::cash, &S5::Company::currentLoan, &S5::Company::updateCounter,
+            &S5::Company::performanceIndex, &S5::Company::competitorId, &S5::Company::ownerEmotion,
+            &S5::Company::mainColours, &S5::Company::vehicleColours,
+            &S5::Company::customVehicleColoursSet, &S5::Company::unlockedVehicles,
+            &S5::Company::availableVehicles, &S5::Company::aiPlaystyleFlags,
+            &S5::Company::aiPlaystyleTownId, &S5::Company::numExpenditureYears,
+            &S5::Company::expenditures, &S5::Company::startedDate, &S5::Company::var_49C,
+            &S5::Company::var_4A0, &S5::Company::var_4A4, &S5::Company::var_4A5,
+            &S5::Company::var_4A6, &S5::Company::var_4A7, &S5::Company::aiThoughts,
+            &S5::Company::activeThoughtId, &S5::Company::headquartersZ,
+            &S5::Company::headquartersX, &S5::Company::headquartersY,
+            &S5::Company::activeThoughtRevenueEstimate, &S5::Company::var_2582,
+            &S5::Company::pad_2586, &S5::Company::var_2596, &S5::Company::var_259A,
+            &S5::Company::var_259B, &S5::Company::var_259C, &S5::Company::pad_259D,
+            &S5::Company::aiPlaceVehicleIndex, &S5::Company::pad_25A2, &S5::Company::var_25BE,
+            &S5::Company::currentRating, &S5::Company::var_25C0, &S5::Company::var_25C0_length,
+            &S5::Company::var_85C2, &S5::Company::var_85C3, &S5::Company::var_85C4,
+            &S5::Company::var_85C8, &S5::Company::var_85C9, &S5::Company::var_85CD,
+            &S5::Company::var_85CE, &S5::Company::var_85CF, &S5::Company::var_85D0,
+            &S5::Company::var_85D4, &S5::Company::var_85D5, &S5::Company::var_85D7,
+            &S5::Company::var_85DB, &S5::Company::var_85DC, &S5::Company::var_85DE,
+            &S5::Company::var_85E2, &S5::Company::var_85E6, &S5::Company::var_85E8,
+            &S5::Company::var_85EA, &S5::Company::var_85EE, &S5::Company::var_85EF,
+            &S5::Company::var_85F0, &S5::Company::var_85F2, &S5::Company::var_85F6,
+            &S5::Company::cargoUnitsTotalDelivered, &S5::Company::cargoUnitsDeliveredHistory,
+            &S5::Company::performanceIndexHistory, &S5::Company::historySize,
+            &S5::Company::companyValueHistory, &S5::Company::vehicleProfit,
+            &S5::Company::transportTypeCount, &S5::Company::activeEmotions,
+            &S5::Company::observationStatus, &S5::Company::observationTownId,
+            &S5::Company::observationEntity, &S5::Company::observationX,
+            &S5::Company::observationY, &S5::Company::observationObject,
+            &S5::Company::observationTimeout, &S5::Company::ownerStatus, &S5::Company::pad_8BCA,
+            &S5::Company::cargoDelivered, &S5::Company::challengeProgress,
+            &S5::Company::numMonthsInTheRed, &S5::Company::cargoUnitsTotalDistance,
+            &S5::Company::cargoUnitsDistanceHistory, &S5::Company::jailStatus,
+            &S5::Company::pad_8E36);
+    };
+    static_assert(validateDescriptorSize<S5::Company>());
 }

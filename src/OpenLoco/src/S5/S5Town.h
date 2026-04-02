@@ -1,6 +1,7 @@
 #pragma once
 
 #include "S5/S5LabelFrame.h"
+#include <OpenLoco/Core/Reflection.hpp>
 #include <OpenLoco/Engine/World.hpp>
 
 namespace OpenLoco
@@ -43,4 +44,21 @@ namespace OpenLoco::S5
 
     S5::Town exportTown(const OpenLoco::Town& src);
     OpenLoco::Town importTown(const S5::Town& src);
+}
+
+namespace OpenLoco::Reflection
+{
+    template<>
+    struct Descriptor<S5::Town>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::Town::name, &S5::Town::x, &S5::Town::y, &S5::Town::flags, &S5::Town::labelFrame,
+            &S5::Town::prng0, &S5::Town::prng1, &S5::Town::population, &S5::Town::populationCapacity,
+            &S5::Town::numBuildings, &S5::Town::companyRatings, &S5::Town::companiesWithRating,
+            &S5::Town::size, &S5::Town::historySize, &S5::Town::history, &S5::Town::historyMinPopulation,
+            &S5::Town::var_150, &S5::Town::monthlyCargoDelivered, &S5::Town::cargoInfluenceFlags,
+            &S5::Town::var_19C, &S5::Town::buildSpeed, &S5::Town::numberOfAirports,
+            &S5::Town::numStations, &S5::Town::var_1A8, &S5::Town::pad_1AC);
+    };
+    static_assert(validateDescriptorSize<S5::Town>());
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <OpenLoco/Core/Reflection.hpp>
 #include <OpenLoco/Engine/World.hpp>
 #include <cstdint>
 
@@ -21,4 +22,15 @@ namespace OpenLoco::S5
 
     S5::Wave exportWave(const OpenLoco::World::Wave& src);
     OpenLoco::World::Wave importWave(const S5::Wave& src);
+}
+
+namespace OpenLoco::Reflection
+{
+    template<>
+    struct Descriptor<S5::Wave>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::Wave::loc, &S5::Wave::frame);
+    };
+    static_assert(validateDescriptorSize<S5::Wave>());
 }

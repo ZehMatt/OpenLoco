@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <OpenLoco/Core/Reflection.hpp>
 
 namespace OpenLoco
 {
@@ -24,4 +25,16 @@ namespace OpenLoco::S5
 
     S5::Message exportMessage(const OpenLoco::Message& src);
     OpenLoco::Message importMessage(const S5::Message& src);
+}
+
+namespace OpenLoco::Reflection
+{
+    template<>
+    struct Descriptor<S5::Message>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::Message::type, &S5::Message::messageString, &S5::Message::companyId,
+            &S5::Message::timeActive, &S5::Message::itemSubjects, &S5::Message::date);
+    };
+    static_assert(validateDescriptorSize<S5::Message>());
 }

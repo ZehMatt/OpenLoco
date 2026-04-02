@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Economy/Currency.h"
+#include <OpenLoco/Core/Reflection.hpp>
 #include <OpenLoco/Engine/World.hpp>
 #include <cstdint>
 
@@ -386,4 +387,30 @@ namespace OpenLoco::S5
 
     S5::Entity exportEntity(const OpenLoco::Entity& src);
     OpenLoco::Entity importEntity(const S5::Entity& src);
+}
+
+namespace OpenLoco::Reflection
+{
+    template<>
+    struct Descriptor<S5::EntityBase>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::EntityBase::baseType, &S5::EntityBase::type, &S5::EntityBase::nextQuadrantId,
+            &S5::EntityBase::nextEntityId, &S5::EntityBase::llPreviousId,
+            &S5::EntityBase::linkedListOffset, &S5::EntityBase::spriteHeightNegative,
+            &S5::EntityBase::id, &S5::EntityBase::vehicleFlags, &S5::EntityBase::position,
+            &S5::EntityBase::spriteWidth, &S5::EntityBase::spriteHeightPositive,
+            &S5::EntityBase::spriteLeft, &S5::EntityBase::spriteTop, &S5::EntityBase::spriteRight,
+            &S5::EntityBase::spriteBottom, &S5::EntityBase::spriteYaw, &S5::EntityBase::spritePitch,
+            &S5::EntityBase::pad_20, &S5::EntityBase::owner, &S5::EntityBase::name);
+    };
+    static_assert(validateDescriptorSize<S5::EntityBase>());
+
+    template<>
+    struct Descriptor<S5::Entity>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::Entity::base, &S5::Entity::pad_24);
+    };
+    static_assert(validateDescriptorSize<S5::Entity>());
 }

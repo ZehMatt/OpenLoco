@@ -1,5 +1,6 @@
 #pragma once
 
+#include <OpenLoco/Core/Reflection.hpp>
 #include <OpenLoco/Engine/World.hpp>
 
 namespace OpenLoco
@@ -54,4 +55,33 @@ namespace OpenLoco::S5
 
     S5::Industry exportIndustry(const OpenLoco::Industry& src);
     OpenLoco::Industry importIndustry(const S5::Industry& src);
+}
+
+namespace OpenLoco::Reflection
+{
+    template<>
+    struct Descriptor<S5::Industry>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::Industry::name, &S5::Industry::x, &S5::Industry::y, &S5::Industry::flags,
+            &S5::Industry::prng0, &S5::Industry::prng1, &S5::Industry::objectId,
+            &S5::Industry::under_construction, &S5::Industry::foundingYear, &S5::Industry::numTiles,
+            &S5::Industry::tiles, &S5::Industry::town, &S5::Industry::tileLoop,
+            &S5::Industry::numFarmTiles, &S5::Industry::numIdleFarmTiles, &S5::Industry::productionRate,
+            &S5::Industry::owner, &S5::Industry::stationsInRange, &S5::Industry::producedCargoStatsStation,
+            &S5::Industry::producedCargoStatsRating, &S5::Industry::dailyProductionTarget,
+            &S5::Industry::dailyProduction, &S5::Industry::outputBuffer,
+            &S5::Industry::producedCargoQuantityMonthlyTotal,
+            &S5::Industry::producedCargoQuantityPreviousMonth,
+            &S5::Industry::receivedCargoQuantityMonthlyTotal,
+            &S5::Industry::receivedCargoQuantityPreviousMonth,
+            &S5::Industry::receivedCargoQuantityDailyTotal,
+            &S5::Industry::producedCargoQuantityDeliveredMonthlyTotal,
+            &S5::Industry::producedCargoQuantityDeliveredPreviousMonth,
+            &S5::Industry::producedCargoPercentTransportedPreviousMonth,
+            &S5::Industry::producedCargoMonthlyHistorySize,
+            &S5::Industry::producedCargoMonthlyHistory1, &S5::Industry::producedCargoMonthlyHistory2,
+            &S5::Industry::history_min_production, &S5::Industry::pad_393);
+    };
+    static_assert(validateDescriptorSize<S5::Industry>());
 }

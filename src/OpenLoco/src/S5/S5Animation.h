@@ -1,6 +1,7 @@
 #pragma once
 
 #include <OpenLoco/Engine/World.hpp>
+#include <OpenLoco/Core/Reflection.hpp>
 #include <cstdint>
 
 namespace OpenLoco::World
@@ -22,4 +23,15 @@ namespace OpenLoco::S5
 
     S5::Animation exportAnimation(const OpenLoco::World::Animation& src);
     OpenLoco::World::Animation importAnimation(const S5::Animation& src);
+}
+
+namespace OpenLoco::Reflection
+{
+    template<>
+    struct Descriptor<S5::Animation>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::Animation::baseZ, &S5::Animation::type, &S5::Animation::pos);
+    };
+    static_assert(validateDescriptorSize<S5::Animation>());
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "S5LabelFrame.h"
+#include <OpenLoco/Core/Reflection.hpp>
 #include <OpenLoco/Engine/World.hpp>
 #include <cstdint>
 
@@ -54,4 +55,33 @@ namespace OpenLoco::S5
 
     S5::Station exportStation(const OpenLoco::Station& src);
     OpenLoco::Station importStation(const S5::Station& src);
+}
+
+namespace OpenLoco::Reflection
+{
+    template<>
+    struct Descriptor<S5::StationCargoStats>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::StationCargoStats::quantity, &S5::StationCargoStats::origin,
+            &S5::StationCargoStats::flags, &S5::StationCargoStats::age,
+            &S5::StationCargoStats::rating, &S5::StationCargoStats::enrouteAge,
+            &S5::StationCargoStats::vehicleSpeed, &S5::StationCargoStats::vehicleAge,
+            &S5::StationCargoStats::industryId, &S5::StationCargoStats::densityPerTile);
+    };
+    static_assert(validateDescriptorSize<S5::StationCargoStats>());
+
+    template<>
+    struct Descriptor<S5::Station>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::Station::name, &S5::Station::x, &S5::Station::y, &S5::Station::z,
+            &S5::Station::labelFrame, &S5::Station::owner, &S5::Station::noTilesTimeout,
+            &S5::Station::flags, &S5::Station::town, &S5::Station::cargoStats,
+            &S5::Station::stationTileSize, &S5::Station::stationTiles, &S5::Station::var_3B0,
+            &S5::Station::var_3B1, &S5::Station::var_3B2, &S5::Station::airportRotation,
+            &S5::Station::airportStartPos, &S5::Station::airportMovementOccupiedEdges,
+            &S5::Station::pad_3BE);
+    };
+    static_assert(validateDescriptorSize<S5::Station>());
 }
