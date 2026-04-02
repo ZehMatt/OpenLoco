@@ -8,6 +8,7 @@
 #include "OpenLoco.h"
 #include "S5/S5.h"
 #include "S5/S5File.h"
+#include "S5/S5Options.h"
 #include <OpenLoco/Core/FileStream.h>
 #include <OpenLoco/Core/Reflection.hpp>
 
@@ -52,7 +53,9 @@ namespace OpenLoco::GameSaveCompare
         {
             result.count++;
             if (!result.displayAll && result.count > 1)
+            {
                 return;
+            }
 
             if constexpr (std::is_same_v<T, bool>)
             {
@@ -61,14 +64,11 @@ namespace OpenLoco::GameSaveCompare
             else if constexpr (std::is_enum_v<T>)
             {
                 using U = std::make_unsigned_t<std::underlying_type_t<T>>;
-                Logging::info("DIVERGENCE {}: {:#x} != {:#x}", path.value,
-                    static_cast<U>(lhs), static_cast<U>(rhs));
+                Logging::info("DIVERGENCE {}: {:#x} != {:#x}", path.value, static_cast<U>(lhs), static_cast<U>(rhs));
             }
             else if constexpr (std::is_integral_v<T>)
             {
-                Logging::info("DIVERGENCE {}: {:#x} != {:#x}", path.value,
-                    static_cast<uint64_t>(static_cast<std::make_unsigned_t<T>>(lhs)),
-                    static_cast<uint64_t>(static_cast<std::make_unsigned_t<T>>(rhs)));
+                Logging::info("DIVERGENCE {}: {:#x} != {:#x}", path.value, static_cast<uint64_t>(static_cast<std::make_unsigned_t<T>>(lhs)), static_cast<uint64_t>(static_cast<std::make_unsigned_t<T>>(rhs)));
             }
             else
             {

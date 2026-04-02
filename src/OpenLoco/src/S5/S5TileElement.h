@@ -1,5 +1,6 @@
 #pragma once
 
+#include <OpenLoco/Core/Reflection.hpp>
 #include <cstdint>
 
 namespace OpenLoco::S5
@@ -42,4 +43,16 @@ namespace OpenLoco::S5
     };
     static_assert(sizeof(TileElement) == 8);
 #pragma pack(pop)
+}
+
+namespace OpenLoco::Reflection
+{
+    template<>
+    struct Descriptor<S5::TileElement>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::TileElement::type, &S5::TileElement::flags, &S5::TileElement::baseZ,
+            &S5::TileElement::clearZ, &S5::TileElement::pad_4);
+    };
+    static_assert(validateDescriptorSize<S5::TileElement>());
 }

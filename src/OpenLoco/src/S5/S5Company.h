@@ -59,15 +59,16 @@ namespace OpenLoco::S5
         uint8_t purchaseFlags; // 0x8B 0x533
     };
 
+    struct RoutingHashEntry
+    {
+        uint16_t var_00; // x
+        uint16_t var_02; // y + flags
+        uint8_t var_04;  // z
+        uint8_t var_05;  // trackId | (direction << 6)
+    };
+
     struct Company
     {
-        struct HashTableEntry
-        {
-            uint16_t var_00; // x
-            uint16_t var_02; // y + flags
-            uint8_t var_04;  // z
-            uint8_t var_05;  // trackId | (direction << 6)
-        };
         uint16_t name;
         uint16_t ownerName;
         uint32_t challengeFlags;           // 0x04
@@ -110,7 +111,7 @@ namespace OpenLoco::S5
         uint8_t pad_25A2[0x25BE - 0x25A2];
         uint8_t var_25BE;
         uint8_t currentRating;           // 0x25BF
-        HashTableEntry var_25C0[0x1000]; // 0x25C0 Hash table entries
+        RoutingHashEntry var_25C0[0x1000]; // 0x25C0 Hash table entries
         uint16_t var_25C0_length;        // 0x85C0 Hash table length
         uint8_t var_85C2;
         uint8_t var_85C3;
@@ -165,13 +166,6 @@ namespace OpenLoco::S5
 
     struct CompanyType2
     {
-        struct HashTableEntry
-        {
-            uint16_t var_00; // x
-            uint16_t var_02; // y + flags
-            uint8_t var_04;  // z
-            uint8_t var_05;  // trackId | (direction << 6)
-        };
         uint16_t name;
         uint16_t ownerName;
         uint32_t challengeFlags;           // 0x04
@@ -214,7 +208,7 @@ namespace OpenLoco::S5
         uint8_t pad_25A2[0x25BE - 0x25A2];
         uint8_t var_25BE;
         uint8_t currentRating;           // 0x25BF
-        HashTableEntry var_25C0[0x1000]; // 0x25C0 Hash table entries
+        RoutingHashEntry var_25C0[0x1000]; // 0x25C0 Hash table entries
         uint16_t var_25C0_length;        // 0x85C0 Hash table length
         uint8_t var_85C2;
         uint8_t var_85C3;
@@ -284,6 +278,15 @@ namespace OpenLoco::S5
 
 namespace OpenLoco::Reflection
 {
+    template<>
+    struct Descriptor<S5::RoutingHashEntry>
+    {
+        static constexpr auto kFields = std::make_tuple(
+            &S5::RoutingHashEntry::var_00, &S5::RoutingHashEntry::var_02,
+            &S5::RoutingHashEntry::var_04, &S5::RoutingHashEntry::var_05);
+    };
+    static_assert(validateDescriptorSize<S5::RoutingHashEntry>());
+
     template<>
     struct Descriptor<S5::Records>
     {
