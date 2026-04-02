@@ -110,9 +110,9 @@ namespace OpenLoco::S5
         uint32_t aiPlaceVehicleIndex;
         uint8_t pad_25A2[0x25BE - 0x25A2];
         uint8_t var_25BE;
-        uint8_t currentRating;           // 0x25BF
+        uint8_t currentRating;             // 0x25BF
         RoutingHashEntry var_25C0[0x1000]; // 0x25C0 Hash table entries
-        uint16_t var_25C0_length;        // 0x85C0 Hash table length
+        uint16_t var_25C0_length;          // 0x85C0 Hash table length
         uint8_t var_85C2;
         uint8_t var_85C3;
         World::Pos2 var_85C4;
@@ -207,9 +207,9 @@ namespace OpenLoco::S5
         uint32_t aiPlaceVehicleIndex;
         uint8_t pad_25A2[0x25BE - 0x25A2];
         uint8_t var_25BE;
-        uint8_t currentRating;           // 0x25BF
+        uint8_t currentRating;             // 0x25BF
         RoutingHashEntry var_25C0[0x1000]; // 0x25C0 Hash table entries
-        uint16_t var_25C0_length;        // 0x85C0 Hash table length
+        uint16_t var_25C0_length;          // 0x85C0 Hash table length
         uint8_t var_85C2;
         uint8_t var_85C3;
         World::Pos2 var_85C4;

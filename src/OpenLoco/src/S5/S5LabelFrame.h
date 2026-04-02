@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>
 #include <OpenLoco/Core/Reflection.hpp>
+#include <cstdint>
 
 namespace OpenLoco
 {

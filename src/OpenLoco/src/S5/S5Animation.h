@@ -1,7 +1,7 @@
 #pragma once
 
-#include <OpenLoco/Engine/World.hpp>
 #include <OpenLoco/Core/Reflection.hpp>
+#include <OpenLoco/Engine/World.hpp>
 #include <cstdint>
 
 namespace OpenLoco::World

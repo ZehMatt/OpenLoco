@@ -34,10 +34,14 @@ namespace OpenLoco::Reflection
             }
             size_t nameEnd = end;
             while (nameEnd > 0 && !isIdentChar(s[nameEnd - 1]))
+            {
                 nameEnd--;
+            }
             size_t nameStart = nameEnd;
             while (nameStart > 0 && isIdentChar(s[nameStart - 1]))
+            {
                 nameStart--;
+            }
             return s.substr(nameStart, nameEnd - nameStart);
         }
     }
@@ -74,7 +78,8 @@ namespace OpenLoco::Reflection
         [&]<size_t... Is>(std::index_sequence<Is...>) {
             (fn(a.*std::get<Is>(kFields),
                 b.*std::get<Is>(kFields),
-                Detail::extractMemberName<std::get<Is>(kFields)>()), ...);
+                Detail::extractMemberName<std::get<Is>(kFields)>()),
+             ...);
         }(std::make_index_sequence<std::tuple_size_v<std::remove_cvref_t<decltype(kFields)>>>{});
     }
 
@@ -84,7 +89,8 @@ namespace OpenLoco::Reflection
         constexpr auto& kFields = Descriptor<T>::kFields;
         [&]<size_t... Is>(std::index_sequence<Is...>) {
             (fn(obj.*std::get<Is>(kFields),
-                Detail::extractMemberName<std::get<Is>(kFields)>()), ...);
+                Detail::extractMemberName<std::get<Is>(kFields)>()),
+             ...);
         }(std::make_index_sequence<std::tuple_size_v<std::remove_cvref_t<decltype(kFields)>>>{});
     }
 
